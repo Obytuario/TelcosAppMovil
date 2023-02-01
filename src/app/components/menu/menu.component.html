@@ -1,3 +1,33 @@
-<p>
-  menu works!
-</p>
+<ion-menu side="start" contentId="main-content" menuId="first">
+  <ion-header>
+    <ion-toolbar color="telco">
+      <ion-title>Menu</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="ion-padding">
+    <ion-list>
+
+      <ion-menu-toggle>
+
+        <ion-item *ngFor="let c of componentes | async" [routerLink]="c.redirectTo">
+          <ion-icon [name]="c.icon" slot="start" class="color-icon"></ion-icon>
+          {{ c.name }}
+        </ion-item>
+
+      </ion-menu-toggle>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+<!-- <div class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button color="primary"></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Telcos</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="ion-padding">
+    Tap the button in the toolbar to open the menu.
+  </ion-content>
+</div> -->

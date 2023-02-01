@@ -1,9 +1,58 @@
-<ion-header>
+<app-menu></app-menu>
+<ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>home</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button menu="first" class="color-icon"></ion-menu-button>
+    </ion-buttons>
+    <ion-img class="img" src="./../../assets/logo_telcos_header.png"></ion-img>
+    <!-- <ion-title>TELCOS</ion-title> -->
+    <ion-buttons slot="end">
+      <ion-button class="color-icon" (click)="presentPopover($event)">
+        <ion-icon slot="icon-only" name="person"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content id="main-content" class="ion-padding">
+  <ion-list>
+    <ion-list-header>
+      <ion-label>
+        <h1>Ordenes de trabajo</h1>
+      </ion-label>
+      <ion-button></ion-button>
+    </ion-list-header>
+    <ion-item-sliding *ngFor="let user of usuarios | async">
+
+      <ion-item>
+        <ion-label>
+          <h3 class="text-bold text-small">OT:</h3>
+          <h3 class="text-small">{{user.id}}</h3>
+          <h3 class="text-bold text-small">Cuenta:</h3>
+          <h3 class="text-small">{{user.address.zipcode}}</h3>
+        </ion-label>
+
+        <ion-label>
+          <h3 class="text-bold text-small">Suscriptor:</h3>
+          <h3 class="text-small ion-text-wrap">{{user.name}}</h3>
+        </ion-label>
+
+        <ion-label slot="end" class="ion-text-end text-small">
+          <a class="state" [ngClass]="user.id == 1 ? 'razonada' : user.id == 2 ? 'proceso' : 'exitosa'">Razonada</a>
+        </ion-label>
+      </ion-item>
+
+      <ion-item-options side="end">
+        <ion-item-option (click)="favorite(user)">
+          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="success" (click)="favorite(user)">
+          <ion-icon slot="icon-only" name="clipboard-outline"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+
+    </ion-item-sliding>
+
+  </ion-list>
 
 </ion-content>

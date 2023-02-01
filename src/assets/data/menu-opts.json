@@ -1,0 +1,12 @@
+[
+  {
+    "icon": "list",
+    "name": "Ordenes de trabajo",
+    "redirectTo": "/avatar"
+  },
+  {
+    "icon": "hammer",
+    "name": "Gestión de insumos",
+    "redirectTo": "/buttons"
+  }
+]

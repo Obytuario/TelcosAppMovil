@@ -24,3 +24,16 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+
+
+.color-icon{
+  color: #e78415;
+}
+
+ion-loading.custom-loading {
+  //--background: #e3edff;
+  --spinner-color: #201f49;
+
+  //color: #201f49;
+}
