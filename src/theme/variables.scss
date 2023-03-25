@@ -82,6 +82,14 @@
   --ion-color-telco-contrast-rgb: 255, 255, 255;
   --ion-color-telco-shade: #201f49;
   --ion-color-telco-tint: #201f49;
+
+  /** telco secundary **/
+  --ion-color-telcoSecondary: #e78415;
+  --ion-color-telcoSecondary-rgb: 32, 31, 73;
+  --ion-color-telcoSecondary-contrast: #ffffff;
+  --ion-color-telcoSecondary-contrast-rgb: 255, 255, 255;
+  --ion-color-telcoSecondary-shade: #e78415;
+  --ion-color-telcoSecondary-tint: #e78415;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -250,4 +258,13 @@
   --ion-color-contrast-rgb: var(--ion-color-telco-contrast-rgb) !important;
   --ion-color-shade: var(--ion-color-telco-shade) !important;
   --ion-color-tint: var(--ion-color-telco-tint) !important;
+}
+
+.ion-color-telcoSecondary {
+  --ion-color-base: var(--ion-color-telcoSecondary) !important;
+  --ion-color-base-rgb: var(--ion-color-telcoSecondary-rgb) !important;
+  --ion-color-contrast: var(--ion-color-telcoSecondary-contrast) !important;
+  --ion-color-contrast-rgb: var(--ion-color-telcoSecondary-contrast-rgb) !important;
+  --ion-color-shade: var(--ion-color-telcoSecondary-shade) !important;
+  --ion-color-tint: var(--ion-color-telcoSecondary-tint) !important;
 }

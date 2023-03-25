@@ -1,0 +1,240 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home" color="telco"></ion-back-button>
+    </ion-buttons>
+    <ion-title color="telcoSecondary">Gestión de orden de trabajo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div>
+
+    <div class="flex justify-content-space-between ion-margin-top relative">
+      <div class="absolute full-width line"></div>
+      <div class="flex flex-column justify-content-center full-width"
+        *ngFor="let slide of slides; let index = index; let first = first; let last = last;">
+        <span [ngClass]="{ 'align-self-end': last, 'align-self-center': (!first && !last) }"
+          class="flex flex-column align-items-center justify-content-center bold text-medium radius"
+          style="width: 30px; height: 30px;"
+          [style.background]="slide === currentSlide ? 'var(--ion-color-telcoSecondary)':'var(--ion-color-light-shade)'"
+          [style.color]="slide === currentSlide ? 'var(--ion-color-light)':'var(--ion-color-dark)'"
+          [ngClass]="{ 'align-self-end': last, 'align-self-center': (!first && !last) }">
+          {{ index + 1 }}
+        </span>
+        <span [style.color]="slide === currentSlide ? 'var(--ion-color-telco )':'var(--ion-color-medium)'"
+          [ngClass]="{ 'align-self-end': last, 'align-self-center': (!first && !last) }"
+          class="flex text-medium bold ion-margin-vertical">
+          {{ slide }}
+        </span>
+      </div>
+    </div>
+
+    <ion-slides [options]="slidesOpts" (ionSlideDidChange)="onSlidesDidChange()"
+      (ionSlideWillChange)="onSlidesChanged()">
+      <ng-container *ngFor="let slide of slides">
+        <ion-slide>
+
+          <div class="full-width ion-text-start">
+
+            <form [formGroup]="billingForm" #billingFormRef="ngForm" novalidate *ngIf="slide === 'Actividad'">
+
+              <ion-list-header class="ion-no-padding" style="min-height: auto;">
+                <ion-label class="ion-text-center" color="telcoSecondary">
+                  Actividad
+                </ion-label>
+              </ion-list-header>
+
+              <ion-row>
+                <ion-col>
+                  <ion-item class="item-select" lines="none">
+                    <ion-label position="stacked">Actividades</ion-label>
+                    <select class="text-small" formControlName="activity">
+                      <option [value]="null" disabled selected>
+                        Seleccione Actividad
+                      </option>
+                      <option *ngFor="let activity of activitys" [value]="activity">
+                        {{ activity }}
+                      </option>
+                    </select>
+                  </ion-item>
+                  <ion-text color="danger">
+                    <span class="text-tiny"
+                      [style.visibility]="fBi['activity'].errors?.['required'] && billingFormRef?.submitted ? '' : 'hidden'">
+                      Campo requerido
+                    </span>
+                  </ion-text>
+                </ion-col>
+              </ion-row>
+
+            </form>
+
+            <ion-list *ngIf="slide === 'Actividad'">
+              <ion-list-header>
+                <ion-col col-2>
+                  <ion-label>
+                    <h3 class="text-bold text-small ion-text-center">Cod:</h3>
+                  </ion-label>
+                </ion-col>
+
+                <ion-col col-8>
+                  <ion-label>
+                    <h3 class="text-bold text-small">Actividad:</h3>
+                  </ion-label>
+                </ion-col>
+
+              </ion-list-header>
+
+
+
+              <ion-item-sliding *ngFor="let material of (materials)">
+                <ion-item-options side="start">
+                  <ion-item-option color="telcoSecondary" (click)="goToSupplies(material.id)">
+                    <ion-icon slot="icon-only" name="hammer-outline"></ion-icon>
+                  </ion-item-option>
+                </ion-item-options>
+
+                <ion-item>
+
+                  <ion-col col-2>
+                    <ion-label>
+                      <h3 class="text-small ion-text-center">{{material.id}}</h3>
+                    </ion-label>
+                  </ion-col>
+                  <ion-col col-10>
+                    <ion-label>
+                      <h3 class="text-small ion-text-wrap">{{material.name}}</h3>
+                    </ion-label>
+                  </ion-col>
+
+                </ion-item>
+
+                <ion-item-options side="end">
+                  <ion-item-option color="danger">
+                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                  </ion-item-option>
+                </ion-item-options>
+
+              </ion-item-sliding>
+
+            </ion-list>
+
+            <form [formGroup]="shippingForm" #shippingFormRef="ngForm" novalidate *ngIf="slide === 'Registro'">
+
+              <ion-list-header class="ion-no-padding" style="min-height: auto;">
+                <ion-label class="ion-text-center" color="telcoSecondary">
+                  Registro
+                </ion-label>
+              </ion-list-header>
+
+              <ion-row>
+                <ion-col>
+                  <ion-item lines="none">
+                    <ion-label position="stacked">Tipo de foto</ion-label>
+                    <select class="text-small" formControlName="picture">
+                      <option [value]="null" disabled selected>
+                        Seleccione Tipo
+                      </option>
+                      <option *ngFor="let type of pictureType" [value]="type">
+                        {{ type }}
+                      </option>
+                    </select>
+                  </ion-item>
+                  <ion-text color="danger">
+                    <span class="text-tiny"
+                      [style.visibility]="shippingForm.errors?.['required'] && shippingFormRef.submitted ? '' : 'hidden'">
+                      Field required
+                    </span>
+                  </ion-text>
+                </ion-col>
+              </ion-row>
+
+              <div class="flex align-items-center full-width ion-margin-top">
+                <div class="ion-margin-end">
+                  <h5 class="text-medium bold">Upload image</h5>
+                  <ion-button strong shape="round" color="telcoSecondary" size="small">
+                    Camara
+                  </ion-button>
+                </div>
+                <div>
+                  <img class="img-thumb" [src]="imagePath" *ngIf="imagePath">
+                </div>
+              </div>
+
+            </form>
+
+            <form [formGroup]="paymentForm" #paymentFormRef="ngForm" novalidate *ngIf="slide === 'Cierre'">
+
+
+              <ion-list-header class="ion-no-padding" style="min-height: auto;">
+                <ion-label class="ion-text-center" color="telcoSecondary">
+                  Cierre
+                </ion-label>
+              </ion-list-header>
+
+              <ion-row>
+                <ion-col>
+                  <ion-item lines="none">
+                    <ion-label position="stacked">Auxiliar</ion-label>
+                    <select class="text-small" formControlName="assistant">
+                      <option [value]="null" disabled selected>
+                        Seleccione Auxiliar
+                      </option>
+                      <option *ngFor="let assistant of assistants" [value]="assistant">
+                        {{ assistant }}
+                      </option>
+                    </select>
+                  </ion-item>
+                  <ion-text color="danger">
+                    <span class="text-tiny"
+                      [style.visibility]="paymentForm.errors?.['required'] && paymentFormRef.submitted ? '' : 'hidden'">
+                      Field required
+                    </span>
+                  </ion-text>
+                </ion-col>
+              </ion-row>
+
+              <div class="ion-text-center">
+                <ion-button type="button" style="width: 200px;" class="ion-margin-vertical" strong size="large"
+                  shape="round" color="telcoSecondary" (click)="goToHome()">
+                  Finalizar
+                </ion-button>
+              </div>
+
+              <div class="ion-text-center">
+                <ion-button type="button" style="width: 200px;" class="ion-margin-vertical" strong size="large"
+                  shape="round" color="light" (click)="onBackButtonTouched()">
+                  Regresar
+                </ion-button>
+              </div>
+
+            </form>
+
+          </div>
+
+        </ion-slide>
+
+      </ng-container>
+
+    </ion-slides>
+
+  </div>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <div class="full-width flex align-items-center justify-content-space-between">
+      <ion-button style="width: 120px;" strong shape="round" color="telco"
+        [style.visibility]="(isBeginning || isEnd) ? 'hidden' : ''" (click)="onBackButtonTouched()">
+        <span>Regresar</span>
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+      </ion-button>
+      <ion-button style="width: 120px;" strong shape="round" color="telcoSecondary"
+        [style.visibility]="isEnd ? 'hidden' : ''" (click)="onNextButtonTouched()">
+        <span>Siguiente</span>
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

@@ -14,7 +14,27 @@ const routes: Routes = [
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
+  },  {
+    path: 'work-order',
+    loadChildren: () => import('./pages/work-order/work-order.module').then( m => m.WorkOrderPageModule)
+  },
+  {
+    path: 'materials',
+    loadChildren: () => import('./pages/materials/materials.module').then( m => m.MaterialsPageModule)
+  },
+  {
+    path: 'equipment',
+    loadChildren: () => import('./pages/equipment/equipment.module').then( m => m.EquipmentPageModule)
+  },
+  {
+    path: 'supplies',
+    loadChildren: () => import('./pages/supplies/supplies.module').then( m => m.SuppliesPageModule)
+  },
+  {
+    path: 'manage-work-order',
+    loadChildren: () => import('./pages/manage-work-order/manage-work-order.module').then( m => m.ManageWorkOrderPageModule)
   }
+
 
 ];
 @NgModule({

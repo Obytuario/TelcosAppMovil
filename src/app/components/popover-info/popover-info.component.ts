@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PopoverController } from '@ionic/angular';
+import { StorageService } from '../../services/storage.service';
 
 @Component({
   selector: 'app-popover-info',
@@ -9,7 +10,8 @@ import { PopoverController } from '@ionic/angular';
 })
 export class PopoverInfoComponent implements OnInit {
 
-  constructor(private router: Router, private popoverCtrl: PopoverController) { }
+  constructor(private router: Router, private popoverCtrl: PopoverController,
+    private storageService: StorageService) { }
 
   ngOnInit() {}
 
@@ -18,6 +20,7 @@ export class PopoverInfoComponent implements OnInit {
     this.popoverCtrl.dismiss({
       item: '0'
     });
+    this.storageService.clear();
     this.router.navigate(['/login']);
   }
 

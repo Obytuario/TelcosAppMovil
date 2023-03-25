@@ -15,6 +15,11 @@
 </ion-header>
 
 <ion-content id="main-content" class="ion-padding">
+
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content class="color-icon"></ion-refresher-content>
+  </ion-refresher>
+
   <ion-list>
     <ion-list-header>
       <ion-label>
@@ -22,37 +27,54 @@
       </ion-label>
       <ion-button></ion-button>
     </ion-list-header>
-    <ion-item-sliding *ngFor="let user of usuarios | async">
+    <ion-item-sliding *ngFor="let workOrder of workOrders">
+
+      <ion-item-options side="start">
+        <ion-item-option color="success" (click)="viewWorkOrder(workOrder)">
+          <ion-icon slot="icon-only" name="clipboard-outline"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
 
       <ion-item>
         <ion-label>
           <h3 class="text-bold text-small">OT:</h3>
-          <h3 class="text-small">{{user.id}}</h3>
+          <h3 class="text-small">{{workOrder.numeroOrdenDto}}</h3>
           <h3 class="text-bold text-small">Cuenta:</h3>
-          <h3 class="text-small">{{user.address.zipcode}}</h3>
+          <h3 class="text-small">{{workOrder.cuentaSuscriptorDto}}</h3>
         </ion-label>
 
         <ion-label>
           <h3 class="text-bold text-small">Suscriptor:</h3>
-          <h3 class="text-small ion-text-wrap">{{user.name}}</h3>
+          <h3 class="text-small ion-text-wrap">{{workOrder.nombreSuscriptorDto}}</h3>
         </ion-label>
 
         <ion-label slot="end" class="ion-text-end text-small">
-          <a class="state" [ngClass]="user.id == 1 ? 'razonada' : user.id == 2 ? 'proceso' : 'exitosa'">Razonada</a>
+          <a class="state" [ngClass]="workOrder.codEstadoOrdenDTO == 'RAZO' ? 'razonada' : workOrder.codEstadoOrdenDTO == 'ENPR' ? 'proceso' : 'exitosa'">{{ workOrder.nombreEstadoOrdenDTO }}</a>
         </ion-label>
       </ion-item>
 
-      <ion-item-options side="end">
-        <ion-item-option (click)="favorite(user)">
+      <ion-item-options side="end" *ngIf="workOrder.codEstadoOrdenDTO == 'ENPR'">
+        <ion-item-option (click)="goToManageWorkOrder(workOrder)">
           <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="success" (click)="favorite(user)">
-          <ion-icon slot="icon-only" name="clipboard-outline"></ion-icon>
         </ion-item-option>
       </ion-item-options>
 
     </ion-item-sliding>
 
+  </ion-list>
+
+  <ion-list *ngIf="validateLengthData">
+    <ion-item *ngFor="let item of [1,1,1,1,1,1,1,1,1,1,1]">
+      <ion-label>
+        <h3>
+          <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+        </h3>
+        <p>
+          <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+        </p>
+      </ion-label>
+      <ion-skeleton-text slot="end" animated style="width: 20%"></ion-skeleton-text>
+    </ion-item>
   </ion-list>
 
 </ion-content>

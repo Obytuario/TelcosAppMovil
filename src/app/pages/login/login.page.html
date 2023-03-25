@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content>
-  <form #formulario="ngForm" (ngSubmit)="onSubmit(formulario)" class="ion-padding">
+  <form [formGroup]="loginForm" #loginFormRef="ngForm" novalidate>
 
     <ion-card>
       <ion-img class="img" src="../../../assets/logo_telcos.png"></ion-img>
@@ -14,30 +14,45 @@
     <ion-list-header>
       <h2>BIENVENIDO</h2>
     </ion-list-header>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label>Usuario:</ion-label>
+          <ion-input type="text" placeholder="Usuario" formControlName="user" required></ion-input>
+        </ion-item>
+        <div class="text-tiny ion-text-right">
+          <ion-text color="danger">
+            <span [style.visibility]="f['user'].errors?.['required'] && loginFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
 
-    <ion-item>
-      <ion-label>Email:</ion-label>
-      <ion-input type="email"
-                 placeholder="Email"
-                 name="email"
-                 [(ngModel)]="usuario.email"
-                 pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$"
-                 required></ion-input>
-    </ion-item>
+        <ion-item>
+          <ion-label>Contraseña:</ion-label>
+          <ion-input type="password" placeholder="Contraseña" formControlName="password" required></ion-input>
+        </ion-item>
+        <div class="text-tiny ion-text-right">
+          <ion-text color="danger">
+            <span [style.visibility]="f['password'].errors?.['required'] && loginFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
 
-    <ion-item>
-      <ion-label>Password:</ion-label>
-      <ion-input type="password"
-                 placeholder="Password"
-                 name="password"
-                 [(ngModel)]="usuario.password"
-                 required></ion-input>
-    </ion-item>
-
-    <ion-button type="submit" expand="block" color="telco">
-        Ingresar
+      </ion-col>
+    </ion-row>
+    <ion-button (click)="onSubmit()" expand="block" color="telco">
+      Ingresar
     </ion-button>
 
+    <div class="text-tiny ion-text-center">
+      <ion-text color="danger">
+        <span [style.visibility]="invalidLogin ? '' : 'hidden'">
+          Credenciales invalidas
+        </span>
+      </ion-text>
+    </div>
   </form>
 
 </ion-content>

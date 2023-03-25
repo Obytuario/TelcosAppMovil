@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  apiUrl: 'https://telcosapp.telcosingenieria.com:8083/TelcosSoftApi/Api'
+  //apiUrl: 'https://localhost:7145/Api'
 };
 
 /*

@@ -1,0 +1,163 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/" color="telco"></ion-back-button>
+    </ion-buttons>
+    <ion-title color="telcoSecondary">Crear orden de trabajo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="workOrderForm" #workOrderFormRef="ngForm" novalidate>
+
+    <ion-list-header>
+      <h5></h5>
+    </ion-list-header>
+
+    <ion-row>
+      <ion-col>
+
+        <ion-item class="item-select" lines="none" >
+          <ion-label position="stacked">Centro de Costo:</ion-label>
+          <br>
+          <select class="text-small" formControlName="operationCenter">
+            <option [value]="null" disabled selected>
+              Seleccione un Centro de Costo
+            </option>
+            <option *ngFor="let operationCenter of (operationCenters |async)" [value]="operationCenter.idDto">
+              {{ operationCenter.descripcionDto }}
+            </option>
+          </select>
+        </ion-item>
+        <div class="text-tiny ion-text-right">
+          <ion-text color="danger">
+            <span [style.visibility]="f['operationCenter'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
+
+        <ion-item class="item-select" lines="none" >
+          <ion-label position="stacked">Tipo de Suscriptor:</ion-label>
+          <br>
+          <select class="text-small" formControlName="subscriberType" (change)="changeSubscriberType()">
+            <option [value]="null" disabled selected>
+              Seleccione un Tipo de Suscriptor
+            </option>
+            <option *ngFor="let subscriberType of subscriberTypes" [value]="subscriberType.idDto">
+              {{ subscriberType.descripcionDto }}
+            </option>
+          </select>
+        </ion-item>
+        <div class="text-tiny ion-text-right">
+          <ion-text color="danger">
+            <span [style.visibility]="f['subscriberType'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
+
+        <ion-item *ngIf="!codSubscriberType">
+          <ion-label position="floating">Razón Social:</ion-label>
+          <ion-input type="text" placeholder="Razón Social" formControlName="businessName" required></ion-input>
+        </ion-item>
+        <div class="text-tiny ion-text-right" *ngIf="!codSubscriberType">
+          <ion-text color="danger">
+            <span [style.visibility]="f['businessName'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
+
+
+        <ion-item *ngIf="codSubscriberType">
+          <ion-label position="floating">Nombre Suscriptor:</ion-label>
+          <ion-input type="text" placeholder="Nombre Suscriptor" formControlName="name" required></ion-input>
+        </ion-item>
+        <div class="text-tiny ion-text-right" *ngIf="codSubscriberType">
+          <ion-text color="danger">
+            <span [style.visibility]="f['name'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
+
+        <ion-item *ngIf="codSubscriberType">
+          <ion-label position="floating">Apellido Suscriptor:</ion-label>
+          <ion-input type="text" placeholder="Apellido Suscriptor" formControlName="lastName" required></ion-input>
+        </ion-item>
+        <div class="text-tiny ion-text-right" *ngIf="codSubscriberType">
+          <ion-text color="danger">
+            <span [style.visibility]="f['lastName'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
+
+        <ion-item>
+          <ion-label position="floating">Dirección:</ion-label>
+          <ion-input type="text" placeholder="Dirección" formControlName="address" required></ion-input>
+        </ion-item>
+        <div class="text-tiny ion-text-right">
+          <ion-text color="danger">
+            <span [style.visibility]="f['address'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
+
+        <ion-item>
+          <ion-label position="floating">Cuenta Suscriptor:</ion-label>
+          <ion-input type="text" placeholder="Cuenta Suscriptor" formControlName="account" required></ion-input>
+        </ion-item>
+        <div class="text-tiny ion-text-right">
+          <ion-text color="danger">
+            <span [style.visibility]="f['account'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
+
+        <ion-item>
+          <ion-label position="floating">Orden de trabajo:</ion-label>
+          <ion-input type="text" placeholder="Orden de trabajo" formControlName="workOrder" required></ion-input>
+        </ion-item>
+        <div class="text-tiny ion-text-right">
+          <ion-text color="danger">
+            <span [style.visibility]="f['workOrder'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
+
+        <ion-item class="item-select" lines="none" >
+          <ion-label position="stacked">Carpeta:</ion-label>
+          <br>
+          <select class="text-small" formControlName="folder">
+            <option [value]="null" disabled selected>
+              Seleccione Carpeta
+            </option>
+            <option *ngFor="let folder of (folders |async)" [value]="folder.idDto">
+              {{ folder.descripcionDto }}
+            </option>
+          </select>
+        </ion-item>
+        <div class="text-tiny ion-text-right">
+          <ion-text color="danger">
+            <span [style.visibility]="f['folder'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
+
+      </ion-col>
+    </ion-row>
+
+    <br>
+
+    <ion-button *ngIf="!update" (click)="onSubmit()" expand="block" color="telcoSecondary">
+      Crear
+    </ion-button>
+
+  </form>
+</ion-content>
