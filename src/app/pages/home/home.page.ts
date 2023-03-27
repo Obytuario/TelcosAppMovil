@@ -53,7 +53,9 @@ export class HomePage implements OnInit {
       idWorkOrderDto: '',
       idfolderDto: '',
       codigoDto: '',
-      supplies: []
+      supplies: [],
+      activity: [],
+      assistants: []
     }
 
     this.variablesManageWorkOrder = {
@@ -114,7 +116,8 @@ export class HomePage implements OnInit {
         idTipoSuscriptorDto: workOrder.idTipoSuscriptorDto,
         nombreSuscriptorDto: workOrder.nombreSuscriptorDto,
         apellidoSuscriptorDto: workOrder.apellidoSuscriptorDto,
-        idCodigoTipoSuscriptorDto: workOrder.idCodigoTipoSuscriptorDto
+        idCodigoTipoSuscriptorDto: workOrder.idCodigoTipoSuscriptorDto,
+        direccionSuscriptorDto: workOrder.direccionSuscriptorDto
       }
     });
 

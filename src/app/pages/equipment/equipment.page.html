@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
   <form [formGroup]="equipmentForm" #equipmentFormRef="ngForm" novalidate>
 
     <ion-list-header>
@@ -62,8 +62,8 @@
             <option [value]="null" disabled selected>
               Seleccione un movimiento
             </option>
-            <option *ngFor="let movement of states" [value]="movement.id">
-              {{ movement.name }}
+            <option *ngFor="let movement of movements" [value]="movement.idDto">
+              {{ movement.descripcionDto }}
             </option>
           </select>
         </ion-item>
@@ -141,7 +141,7 @@
       </ion-item>
 
       <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="deleteEquipment(equipment.codeEquipmentDto)">
+        <ion-item-option color="danger" (click)="deleteEquipment(equipment.idDto)">
           <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
         </ion-item-option>
       </ion-item-options>

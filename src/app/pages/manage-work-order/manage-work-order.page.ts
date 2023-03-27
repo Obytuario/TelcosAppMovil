@@ -5,7 +5,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ActionSheetController, IonContent, IonList, IonSlides, NavController } from '@ionic/angular';
 import { StorageService } from 'src/app/services/storage.service';
 import { Storage } from '@ionic/storage-angular';
-import { VariablesManageWorkOrder } from '../../interfaces/interfaces';
+import { VariablesManageWorkOrder, ManageWorkOrder } from '../../interfaces/interfaces';
+import { ManageWorkOrderService } from './services/manageWorOrder.service';
+import { Activity } from './interface/interfaceManageWorkOrder';
 
 
 @Component({
@@ -21,26 +23,6 @@ export class ManageWorkOrderPage implements OnInit {
   @ViewChild('shippingFormRef', { static: false }) shippingFormRef!: NgForm;
   @ViewChild('paymentFormRef', { static: false }) paymentFormRef!: NgForm;
   @ViewChild(IonList) ionList!: IonList;
-
-  public order: any = {
-    id: 1,
-    items: [{
-      id: 1,
-      name: 'Denim T-Shirt',
-      amount: 15.00,
-    }, {
-      id: 1,
-      name: 'Denim Pants',
-      amount: 5.00,
-    }, {
-      id: 1,
-      name: 'Black T-Shirt',
-      amount: 5.00,
-    }],
-    subtotal: 25.00,
-    shippingFee: 5.00,
-    total: 30.00,
-  };
 
   public billingForm: FormGroup = new FormGroup({});
   public paymentForm: FormGroup = new FormGroup({});
@@ -69,21 +51,10 @@ export class ManageWorkOrderPage implements OnInit {
 
   public variablesManageWorkOrder!: VariablesManageWorkOrder;
 
-  materials: any[] = [{
-    id: 1,
-    name: '1105-AV CAMBIOS DE EQUIPO',
-    type: 'HERRAJE SUSPENSIÓN FIBRA OPTICA',
-  },
-  {
-    id: 2,
-    name: '1107-AV ARREGLO UNIDAD HCF BIDIRECCIONAL',
-    type: 'CONECTOR I-STOP-42 REVERSE TEST TRTC',
-  },
-  {
-    id: 3,
-    name: '1178-AV CAMBIOS DE EQUIPO ZZT',
-    type: 'CORREA PARA AJUSTAR CABLE COAXIAL BLANCA',
-  }];
+  public activityArray: Activity[] = [];
+  public assistantArray: any[] = [];
+  public manageWorkOrder: ManageWorkOrder;
+  public slidesIf: string = 'Actividad'
 
   constructor(private actionSheetCtrl: ActionSheetController,
     private navCtrl: NavController,
@@ -91,48 +62,69 @@ export class ManageWorkOrderPage implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private storage: Storage,
-    private storageService: StorageService) {
-      this.route.queryParams.subscribe(params => {
-        if (params['update'] || '')
-          this.update = true;
+    private storageService: StorageService,
+    private manageWorkOrderService: ManageWorkOrderService) {
+    this.route.queryParams.subscribe(params => {
+      if (params['update'] || '')
+        this.update = true;
 
-          this.idFolder = (params['idCarpetaDto'] || '');
+      this.idFolder = (params['idCarpetaDto'] || '');
 
-      });
-      this.storage.get('variablesManageWorkOrder').then((val) => {
-        console.log(val);
-        this.variablesManageWorkOrder = val;
+    });
+    this.storage.get('variablesManageWorkOrder').then((val) => {
+      console.log(val);
+      this.variablesManageWorkOrder = val;
 
-      });
+    });
+
+    this.manageWorkOrder = {
+      idWorkOrderDto: '',
+      idfolderDto: '',
+      codigoDto: '',
+      supplies: [],
+      activity: [],
+      assistants: []
+    }
+
+    this.getManageWorkOrder();
   }
 
   ngOnInit() {
     this.setupForm();
     this.buildSlides();
-    this.activitys = ['1105-AV CAMBIOS DE EQUIPO',
-      '1107-AV ARREGLO UNIDAD HCF BIDIRECCIONAL',
-      '1178-AV CAMBIOS DE EQUIPO ZZT',
-      '1185-AV CAMBIOS DE CABLES'];
+    this.manageWorkOrderService.GetActivity().subscribe(resp => {
+      this.activitys = resp.result;
+    });
 
-    this.pictureType = ['FACHADA',
-      'POTENCIA'];
+    this.manageWorkOrderService.GetPhotoType().subscribe(resp => {
+      this.pictureType = resp.result;
+    });
 
-    this.assistants = ['103052564-CAMILO ORTIZ',
-      '11076987-CARLOS RESTREPO',
-      '1028975648-MARCO PEREZ',
-      '11855987634-MARIO ALBERTO MENDOZA'];
+    this.manageWorkOrderService.GetAllUsersByRolCode('TECX').subscribe(resp => {
+      this.assistants = resp.result;
+    });
+
+
 
   }
 
-  get fBi(){
+  getManageWorkOrder() {
+    this.storage.get('manageWorkOrder').then((val) => {
+      this.manageWorkOrder = val;
+      this.activityArray = this.manageWorkOrder.activity;
+      this.assistantArray = this.manageWorkOrder.assistants;
+    });
+  }
+
+  get fBi() {
     return this.billingForm.controls;
   }
 
-  get fSh(){
+  get fSh() {
     return this.shippingForm.controls;
   }
 
-  get fPay(){
+  get fPay() {
     return this.paymentForm.controls;
   }
 
@@ -175,9 +167,18 @@ export class ManageWorkOrderPage implements OnInit {
   onBackButtonTouched() {
     this.ionSlides.slidePrev();
     this.ionContent.scrollToTop();
+    if (this.currentSlide === 'Registro') {
+
+      this.slidesIf = 'Actividad';
+
+    } else if (this.currentSlide === 'Cierre') {
+
+      this.slidesIf = 'Registro';
+
+    }
   }
 
-  goToSupplies(idActivity:  string) {
+  goToSupplies(idActivity: string) {
     this.variablesManageWorkOrder.idActivity = idActivity;
     this.setVariablesManageWorkOrder();
     this.ionList.closeSlidingItems();
@@ -188,17 +189,78 @@ export class ManageWorkOrderPage implements OnInit {
     this.router.navigate(['/home']);
   }
 
+  addActivityt() {
+    let ev: any = undefined;
+
+    this.billingFormRef.onSubmit(ev);
+
+    if (this.billingForm.valid) {
+      const activity = {
+        idDto: this.billingForm.get('activity')?.value,
+        descripcionDto: this.getActivity(this.billingForm.get('activity')?.value)?.descripcionDto,
+        codigoDto: this.getActivity(this.billingForm.get('activity')?.value)?.codigoDto
+      }
+      this.activityArray.push(activity);
+      this.billingFormRef.resetForm();
+      this.billingForm.reset();
+
+      this.manageWorkOrder.activity = this.activityArray;
+      this.setManageWorkOrder();
+    }
+  }
+
+  getActivity(id: string) {
+    return this.activitys.find(f => f.idDto === id);
+  }
+
+  deleteActivity(id: string) {
+    this.activityArray = this.activityArray?.filter(f => f.idDto !== id);
+    this.manageWorkOrder.activity = this.activityArray;
+    this.setManageWorkOrder();
+  }
+
+  addAssistant() {
+    let ev: any = undefined;
+
+    this.paymentFormRef.onSubmit(ev);
+
+    if (this.paymentForm.valid) {
+      if (this.assistantArray.length == 0) {
+        const assistant = {
+          idDto: this.paymentForm.get('assistant')?.value,
+          descripcionDto: this.getAssistant(this.paymentForm.get('assistant')?.value)?.fName + ' ' + this.getAssistant(this.paymentForm.get('assistant')?.value)?.lName,
+          codigoDto: this.getAssistant(this.paymentForm.get('assistant')?.value)?.numberDocument
+        }
+        this.assistantArray.push(assistant);
+        this.paymentFormRef.resetForm();
+        this.paymentForm.reset();
+
+        this.manageWorkOrder.assistants = this.assistantArray;
+        this.setManageWorkOrder();
+      }
+    }
+  }
+
+  getAssistant(id: string) {
+    return this.assistants.find(f => f.id === id);
+  }
+
+  deleteAssistant(id: string) {
+    this.assistantArray = this.assistantArray?.filter(f => f.idDto !== id);
+    this.manageWorkOrder.assistants = this.assistantArray;
+    this.setManageWorkOrder();
+  }
+
   onNextButtonTouched() {
 
     let ev: any = undefined;
 
     if (this.currentSlide === 'Actividad') {
 
-      this.billingFormRef.onSubmit(ev);
-
-      if (this.billingForm.valid) {
+      if (this.activityArray.length > 0 && this.manageWorkOrder.supplies.length > 0) {
         this.ionSlides.slideNext();
         this.ionContent.scrollToTop();
+        this.slidesIf = 'Shipping';
       }
 
     } else if (this.currentSlide === 'Shipping') {
@@ -208,6 +270,7 @@ export class ManageWorkOrderPage implements OnInit {
       if (this.shippingForm.valid) {
         this.ionSlides.slideNext();
         this.ionContent.scrollToTop();
+        this.slidesIf = 'Cierre';
       }
 
     } else if (this.currentSlide === 'Payment') {
@@ -241,6 +304,10 @@ export class ManageWorkOrderPage implements OnInit {
 
   async setVariablesManageWorkOrder() {
     await this.storageService.loadVariablesManageWorkOrder(this.variablesManageWorkOrder);
+  }
+
+  async setManageWorkOrder() {
+    await this.storageService.loadManageWorkOrder(this.manageWorkOrder)
   }
 
 }

@@ -10,16 +10,15 @@ const apiUrl = environment.apiUrl;
 @Injectable({
   providedIn: 'root'
 })
-export class EquipmentService {
+export class ManageWorkOrderService {
 
   constructor(private http: HttpClient,
     private readonly resolveReqSvc: ResolveRequestResultService) { }
 
 
-  GetActyvitiEquipmentByFile(fileID: string): Observable<RequestResult<any>> {
-    const params = new HttpParams().set('file', fileID);
+    GetActivity(): Observable<RequestResult<any>> {
     return this.http
-      .get<RequestResult<any>>(`${apiUrl}/Files/GetActyvitiEquipmentByFile`, { params })
+      .get<RequestResult<any>>(`${apiUrl}/WorkOrderFollowUp/GetActivity`)
       .pipe(
         retry(0),
         catchError(this.resolveReqSvc.handleError),
@@ -29,9 +28,23 @@ export class EquipmentService {
       );
   }
 
-  GetAllMovimientoEquipment(): Observable<RequestResult<any>> {
+  GetPhotoType(): Observable<RequestResult<any>> {
     return this.http
-      .get<RequestResult<any>>(`${apiUrl}/WorkOrderFollowUp/GetAllMovimientoEquipment`)
+      .get<RequestResult<any>>(`${apiUrl}/WorkOrderFollowUp/GetPhotoType`)
+      .pipe(
+        retry(0),
+        catchError(this.resolveReqSvc.handleError),
+        // map((vars: RequestResult<any>) =>
+        //   this.resolveReqSvc.resolve<any>(vars)
+        // )
+      );
+  }
+
+  GetAllUsersByRolCode(code: string): Observable<RequestResult<any>> {
+    const params = new HttpParams().set('code', code);
+
+    return this.http
+      .get<RequestResult<any>>(`${apiUrl}/User/GetAllUsersByRolCode`, {params})
       .pipe(
         retry(0),
         catchError(this.resolveReqSvc.handleError),

@@ -1,5 +1,6 @@
 import { Material } from '../pages/materials/interfaces/interfaceMaterials';
 import { Equipment } from '../pages/equipment/interfaces/interfaceEquipment';
+import { Activity } from '../pages/manage-work-order/interface/interfaceManageWorkOrder';
 export interface Menu {
   icon: string;
   name: string;
@@ -48,12 +49,16 @@ export class ManageWorkOrder {
   idfolderDto: string;
   codigoDto: string;
   supplies: Supplies[];
+  activity: Activity[];
+  assistants: any[];
 
   constructor() {
     this.idWorkOrderDto = '';
     this.idfolderDto = '';
     this.codigoDto = '';
     this.supplies = [];
+    this.activity = [];
+    this.assistants = [];
   }
 }
 

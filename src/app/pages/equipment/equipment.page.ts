@@ -24,16 +24,7 @@ export class EquipmentPage implements OnInit {
   public equipments: any[] = [];
   public equipmentsArray?: Equipment[] = [];
 
-  states: any[] = [{
-    id: 1,
-    name: 'Instalado',
-    code: 'INS',
-  },
-  {
-    id: 2,
-    name: 'Retirado',
-    code: 'RET',
-  }];
+  movements: any[] = [];
 
   constructor(private storage: Storage, public equipmentService: EquipmentService,
     private comService: ComponentsService,
@@ -43,7 +34,9 @@ export class EquipmentPage implements OnInit {
       idWorkOrderDto: '',
       idfolderDto: '',
       codigoDto: '',
-      supplies: []
+      supplies: [],
+      activity: [],
+      assistants: []
     }
 
   }
@@ -51,6 +44,13 @@ export class EquipmentPage implements OnInit {
   ngOnInit() {
     this.setupForm();
     this.getVariablesManageWorkOrder();
+    this.GetAllMovimientoEquipment();
+  }
+
+  GetAllMovimientoEquipment() {
+    this.equipmentService.GetAllMovimientoEquipment().subscribe(resp => {
+      this.movements = resp.result;
+    });
   }
 
   getManageWorkOrder() {
@@ -93,10 +93,11 @@ export class EquipmentPage implements OnInit {
     this.equipmentFormRef.onSubmit(ev);
 
     if (this.equipmentForm.valid) {
-      if (!this.equipmentsArray?.find(f => f.codeEquipmentDto === this.equipmentForm.get('equipment')?.value)?.codeEquipmentDto && this.equipmentForm.get('Serial')?.value > 0) {
+      if (!this.equipmentsArray?.find(f => f.idDto === this.equipmentForm.get('equipment')?.value)?.codeEquipmentDto && this.equipmentForm.get('Serial')?.value > 0) {
         const equipment = {
-          codeEquipmentDto: this.equipmentForm.get('equipment')?.value,
-          decriptionEquipmentDto: this.getEquipment(this.equipmentForm.get('equipment')?.value),
+          idDto: this.equipmentForm.get('equipment')?.value,
+          codeEquipmentDto: this.getEquipment(this.equipmentForm.get('equipment')?.value)?.codigoDto,
+          decriptionEquipmentDto: this.getEquipment(this.equipmentForm.get('equipment')?.value)?.nombreGeneric,
           serialDto: this.equipmentForm.get('Serial')?.value,
           movement: this.getMovement(this.equipmentForm.get('movement')?.value)
         };
@@ -110,15 +111,15 @@ export class EquipmentPage implements OnInit {
   }
 
   getEquipment(id: string) {
-    return this.equipments.find(f => f.idParamGenericActividad === id).nombreGeneric;
+    return this.equipments.find(f => f.idParamGenericActividad === id);
   }
 
   getMovement(id: string) {
-    return this.states.find(f => f.id === +id).name;
+    return this.movements.find(f => f.idDto === id).descripcionDto;
   }
 
   deleteEquipment(id: string) {
-    this.equipmentsArray = this.equipmentsArray?.filter(f => f.codeEquipmentDto !== id);
+    this.equipmentsArray = this.equipmentsArray?.filter(f => f.idDto !== id);
     this.mapEquipments();
   }
 
@@ -134,7 +135,8 @@ export class EquipmentPage implements OnInit {
     if (this.manageWorkOrder.supplies.length === 0) {
       this.manageWorkOrder.supplies = [{
         idActivityDto: this.variablesManageWorkOrder.idActivity,
-        equipment: this.equipmentsArray
+        equipment: this.equipmentsArray,
+        material: []
       }];
     } else {
       this.manageWorkOrder.supplies.map(f => {

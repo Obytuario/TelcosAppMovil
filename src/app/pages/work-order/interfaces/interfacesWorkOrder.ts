@@ -11,4 +11,5 @@ export interface SuscriptorDTO {
   apellidoDTO: string;
   tipoSuscriptorDto: string;
   numeroCuentaDto: string;
+  direccionDto: string;
 }

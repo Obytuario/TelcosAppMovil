@@ -52,7 +52,8 @@ export class WorkOrderPage implements OnInit {
             nombreDTO: (params['nombreSuscriptorDto'] || ''),
             apellidoDTO: (params['apellidoSuscriptorDto'] || ''),
             tipoSuscriptorDto: (params['idTipoSuscriptorDto'] || ''),
-            numeroCuentaDto: (params['cuentaSuscriptorDto'] || '')
+            numeroCuentaDto: (params['cuentaSuscriptorDto'] || ''),
+            direccionDto: (params['direccionSuscriptorDto'] || '')
           }
 
         }
@@ -103,7 +104,8 @@ export class WorkOrderPage implements OnInit {
       subscriberType: this.getOrderWorkIN.suscriptorDTO.tipoSuscriptorDto,
       businessName: this.getOrderWorkIN.suscriptorDTO.nombreDTO,
       name: this.getOrderWorkIN.suscriptorDTO.nombreDTO,
-      lastName: this.getOrderWorkIN.suscriptorDTO.apellidoDTO
+      lastName: this.getOrderWorkIN.suscriptorDTO.apellidoDTO,
+      address: this.getOrderWorkIN.suscriptorDTO.direccionDto
     });
     this.workOrderForm.disable();
   }
@@ -131,7 +133,8 @@ export class WorkOrderPage implements OnInit {
           nombreDTO: (this.codSubscriberType) ? this.workOrderForm.get('name')?.value : this.workOrderForm.get('businessName')?.value,
           apellidoDTO: this.workOrderForm.get('lastName')?.value,
           tipoSuscriptorDto: this.workOrderForm.get('subscriberType')?.value,
-          numeroCuentaDto: this.workOrderForm.get('account')?.value
+          numeroCuentaDto: this.workOrderForm.get('account')?.value,
+          direccionDto: this.workOrderForm.get('address')?.value
         }
       };
       this.workOrderService.SaveOrderWork(this.saveOrderWorkIN)
@@ -148,10 +151,10 @@ export class WorkOrderPage implements OnInit {
 
   async presentAlertMultipleButton() {
     const alert = await this.alertCtrl.create({
-      header: 'ORDEN CREADA!',
+      header: 'ORDEN CREADA',
       buttons: [
         {
-          text: 'OK',
+          text: 'Ok',
           role: 'confirm',
           handler: () => {
             this.router.navigate(['/home'], { queryParams: { refresh: true } });

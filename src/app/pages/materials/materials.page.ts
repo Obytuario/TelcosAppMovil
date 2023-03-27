@@ -32,7 +32,10 @@ export class MaterialsPage implements OnInit {
       idWorkOrderDto: '',
       idfolderDto: '',
       codigoDto: '',
-      supplies: []
+      supplies: [],
+      activity: [],
+      assistants: []
+
     }
 
   }
@@ -81,10 +84,11 @@ export class MaterialsPage implements OnInit {
     this.materialFormRef.onSubmit(ev);
 
     if (this.materialForm.valid) {
-      if(!this.materialsArray?.find(f => f.codeMaterialDto === this.materialForm.get('material')?.value)?.codeMaterialDto && this.materialForm.get('quantity')?.value > 0){
+      if(!this.materialsArray?.find(f => f.idDto === this.materialForm.get('material')?.value)?.codeMaterialDto && this.materialForm.get('quantity')?.value > 0){
         const material = {
-          codeMaterialDto: this.materialForm.get('material')?.value,
-          decriptionMaterialDto: this.getMaterial(this.materialForm.get('material')?.value),
+          idDto: this.materialForm.get('material')?.value,
+          codeMaterialDto: this.getMaterial(this.materialForm.get('material')?.value)?.codigoDto,
+          decriptionMaterialDto: this.getMaterial(this.materialForm.get('material')?.value)?.nombreGeneric,
           quantityDto: this.materialForm.get('quantity')?.value
         };
         this.materialsArray?.push(material); //= [...[material], ...this.materialsArray];
@@ -97,11 +101,11 @@ export class MaterialsPage implements OnInit {
   }
 
   getMaterial(id: string) {
-    return this.materials.find(f => f.idParamGenericActividad === id).nombreGeneric;
+    return this.materials.find(f => f.idParamGenericActividad === id);
   }
 
   deleteMaterial(id: string) {
-    this.materialsArray = this.materialsArray?.filter(f => f.codeMaterialDto !== id);
+    this.materialsArray = this.materialsArray?.filter(f => f.idDto !== id);
     this.mapMaterials();
   }
 
@@ -117,7 +121,8 @@ export class MaterialsPage implements OnInit {
     if (this.manageWorkOrder.supplies.length === 0) {
       this.manageWorkOrder.supplies = [{
         idActivityDto: this.variablesManageWorkOrder.idActivity,
-        material: this.materialsArray
+        material: this.materialsArray,
+        equipment: []
       }];
     } else {
       this.manageWorkOrder.supplies.map(f => {

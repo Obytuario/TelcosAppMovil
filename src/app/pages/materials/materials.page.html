@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
   <form [formGroup]="materialForm" #materialFormRef="ngForm" novalidate>
 
     <ion-list-header>
@@ -104,7 +104,7 @@
       </ion-item>
 
       <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="deleteMaterial(material.codeMaterialDto)">
+        <ion-item-option color="danger" (click)="deleteMaterial(material.idDto)">
           <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
         </ion-item-option>
       </ion-item-options>
