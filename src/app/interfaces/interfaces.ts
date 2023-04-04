@@ -25,6 +25,8 @@ export class RequestResult<T> {
 export interface Login {
   user: string;
   password: string;
+  latitude: number;
+  longitude:number;
 }
 
 export interface Session {

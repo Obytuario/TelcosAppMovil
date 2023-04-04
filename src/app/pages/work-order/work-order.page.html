@@ -3,17 +3,12 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/" color="telco"></ion-back-button>
     </ion-buttons>
-    <ion-title color="telcoSecondary">Crear orden de trabajo</ion-title>
+    <ion-title color="telcoSecondary">{{ title }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <form [formGroup]="workOrderForm" #workOrderFormRef="ngForm" novalidate>
-
-    <ion-list-header>
-      <h5></h5>
-    </ion-list-header>
-
     <ion-row>
       <ion-col>
 

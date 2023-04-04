@@ -32,6 +32,7 @@ export class WorkOrderPage implements OnInit {
   public session!: Session;
 
   public update: boolean = false;
+  public title:  string = 'Crear orden de trabajo';
 
   constructor(private router: Router, private comService: ComponentsService,
     private genericService: GenericsService, private storage: Storage,
@@ -40,6 +41,8 @@ export class WorkOrderPage implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['update'] || '') {
         this.update = true;
+
+        this.title = 'Ver orden de trabajo'
 
         this.codSubscriberType = ((params['idCodigoTipoSuscriptorDto'] || '') == 'NATU');
 

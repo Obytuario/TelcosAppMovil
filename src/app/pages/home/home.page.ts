@@ -88,10 +88,10 @@ export class HomePage implements OnInit {
   }
 
   goToManageWorkOrder(workOrder: any) {
-    console.log(workOrder);
     this.variablesManageWorkOrder.idFolder = workOrder.idCarpetaDto;
     this.setVariablesManageWorkOrder();
     this.manageWorkOrder.idfolderDto = workOrder.idCarpetaDto;
+    this.manageWorkOrder.idWorkOrderDto = workOrder.idDto;
     this.setManageWorkOrder();
     this.ionList.closeSlidingItems();
     this.router.navigate(['/manage-work-order'], {
@@ -103,7 +103,6 @@ export class HomePage implements OnInit {
   }
 
   viewWorkOrder(workOrder: any) {
-    console.log(workOrder);
     this.ionList.closeSlidingItems();
     this.router.navigate(['/work-order'], {
       queryParams: {
@@ -135,7 +134,6 @@ export class HomePage implements OnInit {
     await popover.present();
 
     const { data } = await popover.onWillDismiss();
-    console.log(data);
 
   }
 

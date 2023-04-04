@@ -6,6 +6,7 @@ import { Equipment } from './interfaces/interfaceEquipment';
 import { ComponentsService } from '../../services/components.service';
 import { StorageService } from '../../services/storage.service';
 import { EquipmentService } from './services/equipment.service';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-equipment',
@@ -28,7 +29,8 @@ export class EquipmentPage implements OnInit {
 
   constructor(private storage: Storage, public equipmentService: EquipmentService,
     private comService: ComponentsService,
-    private storageService: StorageService) {
+    private storageService: StorageService,
+    private alertCtrl: AlertController) {
 
     this.manageWorkOrder = {
       idWorkOrderDto: '',
@@ -66,7 +68,6 @@ export class EquipmentPage implements OnInit {
 
   getVariablesManageWorkOrder() {
     this.storage.get('variablesManageWorkOrder').then((val) => {
-      console.log(val);
       this.variablesManageWorkOrder = val;
       this.equipmentService.GetActyvitiEquipmentByFile(val.idFolder).subscribe(resp => {
         this.equipments = resp.result;
@@ -93,12 +94,13 @@ export class EquipmentPage implements OnInit {
     this.equipmentFormRef.onSubmit(ev);
 
     if (this.equipmentForm.valid) {
-      if (!this.equipmentsArray?.find(f => f.idDto === this.equipmentForm.get('equipment')?.value)?.codeEquipmentDto && this.equipmentForm.get('Serial')?.value > 0) {
+      if (this.validateForm()) {
         const equipment = {
           idDto: this.equipmentForm.get('equipment')?.value,
           codeEquipmentDto: this.getEquipment(this.equipmentForm.get('equipment')?.value)?.codigoDto,
           decriptionEquipmentDto: this.getEquipment(this.equipmentForm.get('equipment')?.value)?.nombreGeneric,
           serialDto: this.equipmentForm.get('Serial')?.value,
+          idMovement: this.equipmentForm.get('movement')?.value,
           movement: this.getMovement(this.equipmentForm.get('movement')?.value)
         };
         this.equipmentsArray?.push(equipment); //= [...[material], ...this.materialsArray];
@@ -108,6 +110,33 @@ export class EquipmentPage implements OnInit {
         this.mapEquipments();
       }
     }
+  }
+
+  validateForm(): boolean {
+
+    if (this.equipmentsArray?.find(f => f.idDto === this.equipmentForm.get('equipment')?.value && f.serialDto === this.equipmentForm.get('Serial')?.value)?.codeEquipmentDto) {
+      this.presentAlertMultipleButton('Este equipo ya esta asociado');
+      return false;
+    }
+
+    return true;
+  }
+
+  async presentAlertMultipleButton(message: string) {
+    const alert = await this.alertCtrl.create({
+      header: message,
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'confirm',
+          handler: () => {
+
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
 
   getEquipment(id: string) {
@@ -138,6 +167,12 @@ export class EquipmentPage implements OnInit {
         equipment: this.equipmentsArray,
         material: []
       }];
+    } else if (!this.manageWorkOrder.supplies.find(f => f.idActivityDto === this.variablesManageWorkOrder.idActivity)?.idActivityDto) {
+      this.manageWorkOrder.supplies.push({
+        idActivityDto: this.variablesManageWorkOrder.idActivity,
+        equipment: this.equipmentsArray,
+        material: []
+      });
     } else {
       this.manageWorkOrder.supplies.map(f => {
         if (f.idActivityDto === this.variablesManageWorkOrder.idActivity) {

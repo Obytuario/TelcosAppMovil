@@ -6,6 +6,7 @@ import { ComponentsService } from '../../services/components.service';
 import { Material } from './interfaces/interfaceMaterials';
 import { ManageWorkOrder, VariablesManageWorkOrder } from '../../interfaces/interfaces';
 import { StorageService } from 'src/app/services/storage.service';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-materials',
@@ -26,7 +27,8 @@ export class MaterialsPage implements OnInit {
 
   constructor(private storage: Storage, public materialService: MaterialService,
     private comService: ComponentsService,
-    private storageService: StorageService) {
+    private storageService: StorageService,
+    private alertCtrl: AlertController) {
 
     this.manageWorkOrder = {
       idWorkOrderDto: '',
@@ -58,7 +60,6 @@ export class MaterialsPage implements OnInit {
 
   getVariablesManageWorkOrder() {
     this.storage.get('variablesManageWorkOrder').then((val) => {
-      console.log(val);
       this.variablesManageWorkOrder = val;
       this.materialService.GetActyvitiMaterialByFile(val.idFolder).subscribe(resp => {
         this.materials = resp.result;
@@ -84,7 +85,7 @@ export class MaterialsPage implements OnInit {
     this.materialFormRef.onSubmit(ev);
 
     if (this.materialForm.valid) {
-      if(!this.materialsArray?.find(f => f.idDto === this.materialForm.get('material')?.value)?.codeMaterialDto && this.materialForm.get('quantity')?.value > 0){
+      if (this.validateForm()) {
         const material = {
           idDto: this.materialForm.get('material')?.value,
           codeMaterialDto: this.getMaterial(this.materialForm.get('material')?.value)?.codigoDto,
@@ -98,6 +99,36 @@ export class MaterialsPage implements OnInit {
         this.mapMaterials();
       }
     }
+  }
+
+  validateForm(): boolean {
+
+    if (this.materialsArray?.find(f => f.idDto === this.materialForm.get('material')?.value)?.codeMaterialDto) {
+      this.presentAlertMultipleButton('Este material ya esta asociado');
+      return false;
+    } else if (this.materialForm.get('quantity')?.value === 0) {
+      this.presentAlertMultipleButton('La cantidad no es un valor permitido');
+      return false;
+    }
+
+    return true;
+  }
+
+  async presentAlertMultipleButton(message: string) {
+    const alert = await this.alertCtrl.create({
+      header: message,
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'confirm',
+          handler: () => {
+
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
 
   getMaterial(id: string) {
@@ -124,10 +155,18 @@ export class MaterialsPage implements OnInit {
         material: this.materialsArray,
         equipment: []
       }];
+    } else if (!this.manageWorkOrder.supplies.find(f => f.idActivityDto === this.variablesManageWorkOrder.idActivity)?.idActivityDto) {
+      this.manageWorkOrder.supplies.push({
+        idActivityDto: this.variablesManageWorkOrder.idActivity,
+        material: this.materialsArray,
+        equipment: []
+      });
     } else {
       this.manageWorkOrder.supplies.map(f => {
         if (f.idActivityDto === this.variablesManageWorkOrder.idActivity) {
           f.material = this.materialsArray;
+        } else {
+
         }
       });
     }

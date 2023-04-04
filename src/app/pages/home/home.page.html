@@ -31,7 +31,8 @@
 
       <ion-item-options side="start">
         <ion-item-option color="success" (click)="viewWorkOrder(workOrder)">
-          <ion-icon slot="icon-only" name="clipboard-outline"></ion-icon>
+          <ion-icon slot="top" name="clipboard"></ion-icon>
+          Ver orden
         </ion-item-option>
       </ion-item-options>
 
@@ -55,7 +56,8 @@
 
       <ion-item-options side="end" *ngIf="workOrder.codEstadoOrdenDTO == 'ENPR'">
         <ion-item-option (click)="goToManageWorkOrder(workOrder)">
-          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          <ion-icon slot="top" name="create"></ion-icon>
+          <span>Gestionar</span>
         </ion-item-option>
       </ion-item-options>
 

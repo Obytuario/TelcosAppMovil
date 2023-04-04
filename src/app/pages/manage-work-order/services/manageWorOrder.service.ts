@@ -16,7 +16,7 @@ export class ManageWorkOrderService {
     private readonly resolveReqSvc: ResolveRequestResultService) { }
 
 
-    GetActivity(): Observable<RequestResult<any>> {
+  GetActivity(): Observable<RequestResult<any>> {
     return this.http
       .get<RequestResult<any>>(`${apiUrl}/WorkOrderFollowUp/GetActivity`)
       .pipe(
@@ -44,12 +44,24 @@ export class ManageWorkOrderService {
     const params = new HttpParams().set('code', code);
 
     return this.http
-      .get<RequestResult<any>>(`${apiUrl}/User/GetAllUsersByRolCode`, {params})
+      .get<RequestResult<any>>(`${apiUrl}/User/GetAllUsersByRolCode`, { params })
       .pipe(
         retry(0),
         catchError(this.resolveReqSvc.handleError),
         // map((vars: RequestResult<any>) =>
         //   this.resolveReqSvc.resolve<any>(vars)
+        // )
+      );
+  }
+
+  UpdateManageWorkOrder(updateManageWorkOrder: any): Observable<RequestResult<any>> {
+    return this.http
+      .post<RequestResult<any>>(`${apiUrl}/WorkOrderManagement/UpdateManageWorkOrder`, updateManageWorkOrder)
+      .pipe(
+        retry(0),
+        catchError(this.resolveReqSvc.handleError)
+        // map((vars: RequestResult<Session>) =>
+        //   this.resolveReqSvc.resolve<Session>(vars)
         // )
       );
   }

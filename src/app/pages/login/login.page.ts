@@ -6,6 +6,7 @@ import { DataService } from '../../services/data.service';
 import { Login, Session } from '../../interfaces/interfaces';
 import { StorageService } from '../../services/storage.service';
 import { ComponentsService } from '../../services/components.service';
+import { Geolocation } from '@capacitor/geolocation';
 
 @Component({
   selector: 'app-login',
@@ -21,12 +22,27 @@ export class LoginPage implements OnInit {
   public invalidLogin: boolean = false;
   public login!: Login;
   public session!: Session;
+  public coordinates: any;
 
   constructor(private router: Router, private dataService: DataService,
-    private storageService: StorageService, private comService: ComponentsService) { }
+    private storageService: StorageService, private comService: ComponentsService) {
+
+    this.getLocation();
+
+  }
 
   ngOnInit() {
     this.setupForm();
+  }
+
+  async getLocation() {
+    const permissions = await Geolocation.checkPermissions();
+
+    if (permissions.coarseLocation === "denied") {
+      const request = await Geolocation.requestPermissions();
+    } else {
+      this.coordinates = await Geolocation.getCurrentPosition()
+    }
   }
 
   get f() {
@@ -35,8 +51,8 @@ export class LoginPage implements OnInit {
 
   setupForm() {
     this.loginForm = new FormGroup({
-      user: new FormControl(null, Validators.required),
-      password: new FormControl(null, Validators.required)
+      user: new FormControl(null, [Validators.required, Validators.minLength(4), Validators.maxLength(12)]),
+      password: new FormControl(null, [Validators.required, Validators.minLength(4), Validators.maxLength(12)])
     });
   }
 
@@ -47,8 +63,14 @@ export class LoginPage implements OnInit {
     this.loginFormRef.onSubmit(ev);
 
     if (this.loginForm.valid) {
+
       this.showLoading();
-      this.login = { user: this.loginForm.get('user')?.value, password: this.loginForm.get('password')?.value };
+      this.login = {
+        user: this.loginForm.get('user')?.value,
+        password: this.loginForm.get('password')?.value,
+        latitude: this.coordinates.coords.latitude,
+        longitude: this.coordinates.coords.longitude
+      };
       this.dataService.getLogin(this.login)
         .subscribe(resp => {
           if (resp.isSuccessful) {
@@ -71,8 +93,10 @@ export class LoginPage implements OnInit {
     this.comService.dismissLoading();
   }
 
-  async setSession(session: Session){
-    await  this.storageService.loadSession({ token: session.token, userID: session.userID })
+  async setSession(session: Session) {
+    await this.storageService.loadSession({ token: session.token, userID: session.userID })
   }
+
+
 
 }

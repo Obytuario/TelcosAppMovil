@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/manage-work-order" color="telco"></ion-back-button>
+    <ion-buttons slot="end">
+      <ion-back-button defaultHref="/manage-work-order" icon="arrow-forward" color="telco"></ion-back-button>
     </ion-buttons>
     <ion-title color="telcoSecondary">Gestión de insumos</ion-title>
   </ion-toolbar>
@@ -142,7 +142,8 @@
 
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="deleteEquipment(equipment.idDto)">
-          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          <ion-icon slot="top" name="trash"></ion-icon>
+          Eliminar
         </ion-item-option>
       </ion-item-options>
 

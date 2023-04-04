@@ -109,12 +109,12 @@
               <div class="flex align-items-center full-width ion-margin-top">
                 <div class="ion-margin-end">
                   <h5 class="text-medium bold">Upload image</h5>
-                  <ion-button strong shape="round" color="telcoSecondary" size="small">
+                  <ion-button (click)="getCamera()" strong shape="round" color="telcoSecondary" size="small">
                     Camara
                   </ion-button>
                 </div>
                 <div>
-                  <img class="img-thumb" [src]="imagePath" *ngIf="imagePath">
+                  <img class="img-thumb" [src]="imageUrls" *ngIf="imageUrls">
                 </div>
               </div>
 
@@ -192,7 +192,8 @@
 
                   <ion-item-options side="end">
                     <ion-item-option color="danger" (click)="deleteAssistant(assistant.idDto)">
-                      <ion-icon  slot="icon-only" name="trash-outline"></ion-icon>
+                      <ion-icon slot="top" name="trash"></ion-icon>
+                      Eliminar
                     </ion-item-option>
                   </ion-item-options>
 
@@ -250,7 +251,8 @@
 
       <ion-item-options side="start">
         <ion-item-option color="telcoSecondary" (click)="goToSupplies(activity.idDto)">
-          <ion-icon slot="icon-only" name="hammer-outline"></ion-icon>
+          <ion-icon slot="top" name="hammer"></ion-icon>
+          Agregar Insumos
         </ion-item-option>
       </ion-item-options>
 
@@ -270,8 +272,9 @@
       </ion-item>
 
       <ion-item-options side="end">
-        <ion-item-option color="danger">
-          <ion-icon (click)="deleteActivity(activity.idDto)" slot="icon-only" name="trash-outline"></ion-icon>
+        <ion-item-option color="danger" (click)="deleteActivity(activity.idDto)">
+          <ion-icon slot="top" name="trash"></ion-icon>
+          Eliminar
         </ion-item-option>
       </ion-item-options>
 
