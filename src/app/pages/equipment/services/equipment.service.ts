@@ -16,10 +16,10 @@ export class EquipmentService {
     private readonly resolveReqSvc: ResolveRequestResultService) { }
 
 
-  GetActyvitiEquipmentByFile(fileID: string): Observable<RequestResult<any>> {
-    const params = new HttpParams().set('file', fileID);
+    GetEquipmentByActivity(activityID: string): Observable<RequestResult<any>> {
+    const params = new HttpParams().set('activity', activityID);
     return this.http
-      .get<RequestResult<any>>(`${apiUrl}/Files/GetActyvitiEquipmentByFile`, { params })
+      .get<RequestResult<any>>(`${apiUrl}/Files/GetEquipmentByActivity`, { params })
       .pipe(
         retry(0),
         catchError(this.resolveReqSvc.handleError),

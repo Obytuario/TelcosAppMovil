@@ -157,3 +157,13 @@ ion-loading.custom-loading {
 .bold {
   font-weight: bold;
 }
+
+
+body.scanner-active {
+  --background: transparent;
+  --ion-background-color: transparent;
+}
+
+ion-searchbar {
+  --box-shadow: none !important;
+}

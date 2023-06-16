@@ -5,9 +5,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ActionSheetController, AlertController, IonContent, IonList, IonSlides, NavController } from '@ionic/angular';
 import { StorageService } from 'src/app/services/storage.service';
 import { Storage } from '@ionic/storage-angular';
-import { VariablesManageWorkOrder, ManageWorkOrder, Session } from '../../interfaces/interfaces';
+import { VariablesManageWorkOrder, ManageWorkOrder, Session, Masters } from '../../interfaces/interfaces';
 import { ManageWorkOrderService } from './services/manageWorOrder.service';
-import { Activity } from './interface/interfaceManageWorkOrder';
+import { Activity, Photo } from './interface/interfaceManageWorkOrder';
 import { Camera, CameraResultType } from '@capacitor/camera';
 
 
@@ -54,10 +54,13 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
 
   public activityArray: Activity[] = [];
   public assistantArray: any[] = [];
+  public photoArray: Photo[] = [];
   public manageWorkOrder: ManageWorkOrder;
   public slidesIf: string = 'Actividad'
   public session!: Session;
-  public imageUrls!: string | undefined;
+  public imageUrls!: any;
+  public selectMasters!: Masters;
+  public masters!: Masters;
 
 
   constructor(private actionSheetCtrl: ActionSheetController,
@@ -78,9 +81,21 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
 
     });
 
+    this.storage.get('masters').then((val) => {
+      if (val !== null) {
+        this.masters = val;
+      } else {
+        this.masters = {
+          activitys: [],
+          materials: [],
+          equipments: []
+        };
+      }
+
+    });
+
     this.storage.get('variablesManageWorkOrder').then((val) => {
       this.variablesManageWorkOrder = val;
-
     });
 
     this.storage.get('session').then((val) => {
@@ -93,6 +108,7 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
       codigoDto: '',
       supplies: [],
       activity: [],
+      photos: [],
       assistants: []
     }
 
@@ -102,9 +118,17 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.setupForm();
     this.buildSlides();
-    this.manageWorkOrderService.GetActivity().subscribe(resp => {
-      this.activitys = resp.result;
-    });
+    if (this.masters?.activitys?.length > 0) {
+      this.activitys = this.masters.activitys;
+    } else {
+      this.manageWorkOrderService.GetActivity().subscribe(resp => {
+        this.activitys = resp.result;
+        this.masters.activitys = this.activitys;
+        this.setMasters();
+
+      });
+    }
+
 
     this.manageWorkOrderService.GetPhotoType().subscribe(resp => {
       this.pictureType = resp.result;
@@ -114,20 +138,13 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
       this.assistants = resp.result;
     });
 
-
-
   }
 
   callManageWorkOrder() {
-    // this.storage.get('manageWorkOrder').then((val) => {
-    //   this.manageWorkOrder = val;
-    //   this.activityArray = this.manageWorkOrder.activity;
-    //   this.assistantArray = this.manageWorkOrder.assistants;
-    // });
-
     this.getManageWorkOrder().then((val) => {
       this.manageWorkOrder = val;
       this.activityArray = this.manageWorkOrder.activity;
+      this.photoArray = this.manageWorkOrder.photos;
       this.assistantArray = this.manageWorkOrder.assistants;
     });
 
@@ -148,6 +165,15 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
 
   ionViewDidEnter() {
     this.ionSlides.updateAutoHeight();
+    this.storage.get('selectMasters').then((val: Masters) => {
+      this.selectMasters = val;
+      if (val.activitys.length > 0) {
+        this.billingForm.patchValue({
+          activity: val.activitys[0].descripcionDto
+        });
+        console.log('management', val);
+      }
+    });
   }
 
   buildSlides() {
@@ -195,41 +221,48 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
     }
   }
 
-  goToSupplies(idActivity: string) {
+  goToSupplies(idActivity: string,idActivityTemp: string) {
+    this.variablesManageWorkOrder.idActivityTemp = idActivityTemp;
     this.variablesManageWorkOrder.idActivity = idActivity;
     this.setVariablesManageWorkOrder();
     this.ionList.closeSlidingItems();
     this.router.navigate(['/supplies']);
   }
 
+  goToSearch() {
+    this.router.navigate(['/search'], { queryParams: { origin: 'A' } });
+  }
+
   goToHome() {
 
-    this.getManageWorkOrder().then((val) => {
+    this.getManageWorkOrder().then((val: ManageWorkOrder) => {
       const manageWorkOrder = val;
 
       let equiL: any[] = [];
       let matL: any[] = [];
 
-      manageWorkOrder.supplies[0].equipment.forEach((e: any) => {
-        let equi = {
+      if(manageWorkOrder.supplies.length > 0){
+        manageWorkOrder.supplies[0].equipment?.forEach((e: any) => {
+          let equi = {
 
-          paramEquipoDto: e.idDto,
-          serialDto: e.serialDto,
-          idMovimientoDto: e.idMovement
-        }
-        equiL.push(equi);
+            paramEquipoDto: e.idDto,
+            serialDto: e.serialDto,
+            idMovimientoDto: e.idMovement
+          }
+          equiL.push(equi);
 
-      });
+        });
 
-      manageWorkOrder.supplies[0].material.forEach((e: any) => {
-        const mat = {
+        manageWorkOrder.supplies[0].material?.forEach((e: any) => {
+          const mat = {
 
-          paramMaterialDto: e.idDto,
-          cantidadDto: e.quantityDto
-        }
-        matL.push(mat);
+            paramMaterialDto: e.idDto,
+            cantidadDto: e.quantityDto
+          }
+          matL.push(mat);
 
-      });
+        });
+      }
 
       const updateManageWorkOrder = {
         idWorkOrder: manageWorkOrder.idWorkOrderDto,
@@ -251,11 +284,12 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
             codigoDto: '',
             supplies: [],
             activity: [],
+            photos: [],
             assistants: []
           }
-          this.router.navigate(['/home']);
+          this.router.navigate(['/home'], { queryParams: { refresh: true } });
         } else {
-          console.log('No Guardo');
+          this.presentAlertMultipleButton('No se puede gestionar la orden');
         }
       });
     });
@@ -269,9 +303,10 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
     if (this.billingForm.valid) {
       if (this.validateFormActivity()) {
         const activity = {
-          idDto: this.billingForm.get('activity')?.value,
-          descripcionDto: this.getActivity(this.billingForm.get('activity')?.value)?.descripcionDto,
-          codigoDto: this.getActivity(this.billingForm.get('activity')?.value)?.codigoDto
+          id: crypto.randomUUID(),
+          idDto: this.selectMasters.activitys[0].idDto,
+          descripcionDto: this.selectMasters.activitys[0].descripcionDto,
+          codigoDto: this.selectMasters.activitys[0].codigoDto
         }
         this.activityArray.push(activity);
         this.billingFormRef.resetForm();
@@ -279,15 +314,19 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
 
         this.manageWorkOrder.activity = this.activityArray;
         this.setManageWorkOrder();
+
+        this.selectMasters.activitys = [];
+        this.setSelectMasters();
       }
     }
   }
 
   validateFormActivity(): boolean {
-    if (this.activityArray?.find(f => f.idDto === this.billingForm.get('activity')?.value)?.codigoDto) {
-      this.presentAlertMultipleButton('Esta actividad ya esta asociada');
-      return false;
-    }
+    //Se comenta la validación de actividad repetida
+    // if (this.activityArray?.find(f => f.idDto === this.selectMasters.activitys[0].idDto)?.codigoDto) {
+    //   this.presentAlertMultipleButton('Esta actividad ya esta asociada');
+    //   return false;
+    // }
 
     return true;
   }
@@ -297,7 +336,7 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
   }
 
   deleteActivity(id: string) {
-    this.activityArray = this.activityArray?.filter(f => f.idDto !== id);
+    this.activityArray = this.activityArray?.filter(f => f.id !== id);
     this.manageWorkOrder.activity = this.activityArray;
     this.setManageWorkOrder();
   }
@@ -343,17 +382,17 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
       if (this.validateForm()) {
         this.ionSlides.slideNext();
         this.ionContent.scrollToTop();
-        this.slidesIf = 'Shipping';
+        this.slidesIf = 'Registro';
       }
 
-    } else if (this.currentSlide === 'Shipping') {
+    } else if (this.currentSlide === 'Registro') {
 
-      this.shippingFormRef.onSubmit(ev);
-
-      if (this.shippingForm.valid) {
+      if (this.photoArray.length === 1) {
         this.ionSlides.slideNext();
         this.ionContent.scrollToTop();
         this.slidesIf = 'Cierre';
+      } else {
+        this.presentAlertMultipleButton('Debe asociar al menos un tipo de foto');
       }
 
     } else if (this.currentSlide === 'Payment') {
@@ -378,9 +417,10 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
     if (this.activityArray.length == 0) {
       this.presentAlertMultipleButton('Debe asociar una actividad');
       return false;
-    } else if (this.validateSupplies()) {
-      return false;
     }
+    //else if (this.validateSupplies()) {
+    //   return false;
+    // }
 
     return true;
   }
@@ -413,33 +453,88 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
     return false;
   }
 
-  convertBlobToBase64 = (blob: Blob) => new Promise((resolve, reject) => {
-    const reader = new FileReader;
-    reader.onerror = reject;
-    reader.onload = () => resolve(reader.result);
-    reader.readAsDataURL(blob);
-  });
-
   originalOrder = (): number => {
     return 0;
   }
 
-  async getCamera(){
+  validateRegister() {
+
+    let ev: any = undefined;
+
+    this.shippingFormRef.onSubmit(ev);
+
+    if (this.shippingForm.valid) {
+      if (!this.photoArray?.find(f => f.idDto === this.shippingForm.get('picture')?.value)?.idDto) {
+        this.getCamera();
+      } else {
+        this.presentAlertMultipleButton('Este tipo de foto ya se encuentra asociado');
+      }
+
+    }
+
+  }
+
+  async getCamera() {
     const image = await Camera.getPhoto({
       quality: 90,
-      allowEditing: true,
-      resultType: CameraResultType.Uri
+      allowEditing: false,
+      resultType: CameraResultType.Base64,
+      promptLabelHeader: 'Fotos',
+      promptLabelPhoto: 'Abrir Galeria',
+      promptLabelPicture: 'Tomar Foto'
     });
 
     // image.webPath will contain a path that can be set as an image src.
     // You can access the original file using image.path, which can be
     // passed to the Filesystem API to read the raw data of the image,
     // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-    var imageUrl = image.webPath;
+    //console.log(image.base64String);
+    //console.log(image);
+    //var imageUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`data:image/${image.format};base64, ${image.base64String}`);
+    var imageUrl = `data:image/${image.format};base64, ${image.base64String}`;
 
     // Can be set to the src of an image now
     //imageElement.src = imageUrl;
-    this.imageUrls = imageUrl;
+    //this.imageUrls = imageUrl;
+
+    const photo = {
+      idDto: this.shippingForm.get('picture')?.value,
+      descripcionDto: this.getPhoto(this.shippingForm.get('picture')?.value)?.descripcionDto,
+      base64String: image.base64String,
+      imageUrl: imageUrl
+    }
+
+    console.log(imageUrl);
+
+    this.photoArray.push(photo);
+
+    this.shippingFormRef.resetForm();
+    this.shippingForm.reset();
+
+    this.manageWorkOrder.photos = this.photoArray;
+    this.setManageWorkOrder();
+  }
+
+  getPhoto(id: string) {
+    return this.pictureType.find(f => f.idDto === id);
+  }
+
+  deletePhoto(id: string) {
+    this.photoArray = this.photoArray?.filter(f => f.idDto !== id);
+    this.manageWorkOrder.photos = this.photoArray;
+    this.setManageWorkOrder();
+  }
+
+  GetSanitizer(url: string) {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url)
+  }
+
+  async setSelectMasters() {
+    await this.storageService.loadSelectMasters(this.selectMasters);
+  }
+
+  async setMasters() {
+    await this.storageService.loadMasters(this.masters);
   }
 
   async setVariablesManageWorkOrder() {

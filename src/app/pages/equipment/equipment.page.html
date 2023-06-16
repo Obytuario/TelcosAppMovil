@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header [style.visibility]="content_visibility">
   <ion-toolbar>
     <ion-buttons slot="end">
       <ion-back-button defaultHref="/manage-work-order" icon="arrow-forward" color="telco"></ion-back-button>
@@ -8,146 +8,168 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="equipmentForm" #equipmentFormRef="ngForm" novalidate>
 
-    <ion-list-header>
-      <h5>Equipos</h5>
-    </ion-list-header>
+  <div [style.visibility]="content_visibility">
+    <form [formGroup]="equipmentForm" #equipmentFormRef="ngForm" novalidate>
 
-    <ion-row>
-      <ion-col>
+      <ion-list-header>
+        <h5>Equipos</h5>
+      </ion-list-header>
 
-        <ion-item class="item-select" lines="none">
-          <ion-label position="stacked">Equipos:</ion-label>
+      <ion-row>
+        <ion-col size="10">
+
+          <ion-item class="item-select" lines="none">
+            <ion-label position="stacked">Equipos:</ion-label>
+            <br>
+            <ion-input type="text" placeholder="Seleccione un equipo" formControlName="equipment" required></ion-input>
+          </ion-item>
+          <div class="text-tiny ion-text-right">
+            <ion-text color="danger">
+              <span
+                [style.visibility]="f['equipment'].errors?.['required'] && equipmentFormRef?.submitted ? '' : 'hidden'">
+                Campo requerido
+              </span>
+            </ion-text>
+          </div>
+
+        </ion-col>
+
+        <ion-col size="2">
           <br>
-          <select class="text-small" formControlName="equipment">
-            <option [value]="null" disabled selected>
-              Seleccione un equipo
-            </option>
-            <option *ngFor="let equipment of equipments" [value]="equipment.idParamGenericActividad">
-              {{ equipment.nombreGeneric }}
-            </option>
-          </select>
-        </ion-item>
-        <div class="text-tiny ion-text-right">
-          <ion-text color="danger">
-            <span
-              [style.visibility]="f['equipment'].errors?.['required'] && equipmentFormRef?.submitted ? '' : 'hidden'">
-              Campo requerido
-            </span>
-          </ion-text>
-        </div>
-
-        <ion-item>
-          <ion-label position="floating">Serial:</ion-label>
-          <ion-input type="text" placeholder="Serial" formControlName="Serial" required></ion-input>
-
-          <ion-button (click)="viewScanner()" slot="end" expand="block" color="telcoSecondary">
-            <ion-icon slot="icon-only" name="barcode-outline"></ion-icon>
+          <br>
+          <ion-button size="small" (click)="goToSearch()" color="telcoSecondary">
+            <ion-icon slot="icon-only" name="search"></ion-icon>
           </ion-button>
+        </ion-col>
 
-        </ion-item>
-        <div class="text-tiny ion-text-right">
-          <ion-text color="danger">
-            <span [style.visibility]="f['Serial'].errors?.['required'] && equipmentFormRef?.submitted ? '' : 'hidden'">
-              Campo requerido
-            </span>
-          </ion-text>
-        </div>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Serial:</ion-label>
+            <ion-input type="text" placeholder="Serial" formControlName="Serial" required></ion-input>
 
-        <ion-item class="item-select" lines="none">
-          <ion-label position="stacked">Movimientos:</ion-label>
-          <br>
-          <select class="text-small" formControlName="movement">
-            <option [value]="null" disabled selected>
-              Seleccione un movimiento
-            </option>
-            <option *ngFor="let movement of movements" [value]="movement.idDto">
-              {{ movement.descripcionDto }}
-            </option>
-          </select>
-        </ion-item>
-        <div class="text-tiny ion-text-right">
-          <ion-text color="danger">
-            <span
-              [style.visibility]="f['movement'].errors?.['required'] && equipmentFormRef?.submitted ? '' : 'hidden'">
-              Campo requerido
-            </span>
-          </ion-text>
-        </div>
+            <ion-button (click)="startScan()" slot="end" expand="block" color="telcoSecondary">
+              <ion-icon slot="icon-only" name="barcode-outline"></ion-icon>
+            </ion-button>
 
-      </ion-col>
-    </ion-row>
+          </ion-item>
+          <div class="text-tiny ion-text-right">
+            <ion-text color="danger">
+              <span
+                [style.visibility]="f['Serial'].errors?.['required'] && equipmentFormRef?.submitted ? '' : 'hidden'">
+                Campo requerido
+              </span>
+            </ion-text>
+          </div>
+
+          <ion-item class="item-select" lines="none">
+            <ion-label position="stacked">Movimientos:</ion-label>
+            <br>
+            <select class="text-small" formControlName="movement">
+              <option [value]="null" disabled selected>
+                Seleccione un movimiento
+              </option>
+              <option *ngFor="let movement of movements" [value]="movement.idDto">
+                {{ movement.descripcionDto }}
+              </option>
+            </select>
+          </ion-item>
+          <div class="text-tiny ion-text-right">
+            <ion-text color="danger">
+              <span
+                [style.visibility]="f['movement'].errors?.['required'] && equipmentFormRef?.submitted ? '' : 'hidden'">
+                Campo requerido
+              </span>
+            </ion-text>
+          </div>
+
+        </ion-col>
+      </ion-row>
+
+      <br>
+
+      <ion-button (click)="onSubmit()" expand="block" color="telcoSecondary">
+        Adicionar
+      </ion-button>
+
+    </form>
 
     <br>
 
-    <ion-button (click)="onSubmit()" expand="block" color="telcoSecondary">
-      Adicionar
-    </ion-button>
-
-  </form>
-
-  <br>
-
-  <ion-list>
-    <ion-list-header>
-      <ion-col col-4>
-        <ion-label>
-          <h3 class="text-bold text-small ion-text-center">Cod:</h3>
-        </ion-label>
-      </ion-col>
-      <ion-col col-4>
-        <ion-label>
-          <h3 class="text-bold text-small">Equipo:</h3>
-        </ion-label>
-      </ion-col>
-      <ion-col col-4>
-        <ion-label>
-          <h3 class="text-bold text-small">Serial:</h3>
-        </ion-label>
-      </ion-col>
-      <ion-col col-4>
-        <ion-label>
-          <h3 class="text-bold text-small">Movimiento:</h3>
-        </ion-label>
-      </ion-col>
-
-    </ion-list-header>
-    <ion-item-sliding *ngFor="let equipment of (equipmentsArray)">
-
-      <ion-item>
-
+    <ion-list>
+      <ion-list-header>
         <ion-col col-4>
           <ion-label>
-            <h3 class="text-small ion-text-center ion-text-wrap">{{equipment.codeEquipmentDto}}</h3>
+            <h3 class="text-bold text-small ion-text-center">Cod:</h3>
           </ion-label>
         </ion-col>
         <ion-col col-4>
           <ion-label>
-            <h3 class="text-small ion-text-wrap">{{equipment.decriptionEquipmentDto}}</h3>
+            <h3 class="text-bold text-small">Equipo:</h3>
           </ion-label>
         </ion-col>
         <ion-col col-4>
           <ion-label>
-            <h3 class="text-small ion-text-wrap">{{equipment.serialDto}}</h3>
+            <h3 class="text-bold text-small">Serial:</h3>
           </ion-label>
         </ion-col>
         <ion-col col-4>
-          <ion-label class="">
-            <h3 class="text-small ion-text-wrap ion-text-center">{{equipment.movement}}</h3>
+          <ion-label>
+            <h3 class="text-bold text-small">Movimiento:</h3>
           </ion-label>
         </ion-col>
 
-      </ion-item>
+      </ion-list-header>
+      <ion-item-sliding *ngFor="let equipment of (equipmentsArray)">
 
-      <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="deleteEquipment(equipment.idDto)">
-          <ion-icon slot="top" name="trash"></ion-icon>
-          Eliminar
-        </ion-item-option>
-      </ion-item-options>
+        <ion-item>
 
-    </ion-item-sliding>
+          <ion-col col-4>
+            <ion-label>
+              <h3 class="text-small ion-text-center ion-text-wrap">{{equipment.codeEquipmentDto}}</h3>
+            </ion-label>
+          </ion-col>
+          <ion-col col-4>
+            <ion-label>
+              <h3 class="text-small ion-text-wrap">{{equipment.decriptionEquipmentDto}}</h3>
+            </ion-label>
+          </ion-col>
+          <ion-col col-4>
+            <ion-label>
+              <h3 class="text-small ion-text-wrap">{{equipment.serialDto}}</h3>
+            </ion-label>
+          </ion-col>
+          <ion-col col-4>
+            <ion-label class="">
+              <h3 class="text-small ion-text-wrap ion-text-center">{{equipment.movement}}</h3>
+            </ion-label>
+          </ion-col>
 
-  </ion-list>
+        </ion-item>
+
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="deleteEquipment(equipment.idDto)">
+            <ion-icon slot="top" name="trash"></ion-icon>
+            Eliminar
+          </ion-item-option>
+        </ion-item-options>
+
+      </ion-item-sliding>
+
+    </ion-list>
+  </div>
+
+  <!-- <p class="ion-text-center" *ngIf="result && !scanActive" -->
+
+  <ion-row class="scanner-buttons" [hidden]="!scanActive">
+    <ion-col class="ion-no-padding">
+      <ion-button expand="full" (click)="stopScan()" color="telcoSecondary">Detener</ion-button>
+    </ion-col>
+  </ion-row>
+
+<div class="scan-box" [hidden]="!scanActive">
+
+</div>
+
+
 </ion-content>

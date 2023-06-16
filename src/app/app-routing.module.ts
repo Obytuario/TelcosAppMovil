@@ -14,7 +14,8 @@ const routes: Routes = [
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
-  },  {
+  },
+  {
     path: 'work-order',
     loadChildren: () => import('./pages/work-order/work-order.module').then( m => m.WorkOrderPageModule)
   },
@@ -33,6 +34,10 @@ const routes: Routes = [
   {
     path: 'manage-work-order',
     loadChildren: () => import('./pages/manage-work-order/manage-work-order.module').then( m => m.ManageWorkOrderPageModule)
+  },
+  {
+    path: 'search',
+    loadChildren: () => import('./pages/search/search.module').then( m => m.SearchPageModule)
   }
 
 

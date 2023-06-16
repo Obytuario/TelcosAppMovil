@@ -55,12 +55,14 @@ export class HomePage implements OnInit {
       codigoDto: '',
       supplies: [],
       activity: [],
+      photos: [],
       assistants: []
     }
 
     this.variablesManageWorkOrder = {
       idFolder: '',
-      idActivity: '',
+      idActivityTemp: '',
+      idActivity: ''
     }
   }
 

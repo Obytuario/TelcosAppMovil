@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Storage } from '@ionic/storage-angular';
-import { Session, ManageWorkOrder, VariablesManageWorkOrder } from '../interfaces/interfaces';
+import { Session, ManageWorkOrder, VariablesManageWorkOrder, Masters } from '../interfaces/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +28,22 @@ export class StorageService {
   async loadSession(session: Session) {
     try {
       await this.storage.set('session', session);
+    } catch (error) {
+
+    }
+  }
+
+  async loadSelectMasters(selectMasters: Masters) {
+    try {
+      await this.storage.set('selectMasters', selectMasters);
+    } catch (error) {
+
+    }
+  }
+
+  async loadMasters(masters: Masters) {
+    try {
+      await this.storage.set('masters', masters);
     } catch (error) {
 
     }

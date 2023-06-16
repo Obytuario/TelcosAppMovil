@@ -16,10 +16,10 @@ export class MaterialService {
     private readonly resolveReqSvc: ResolveRequestResultService) { }
 
 
-    GetActyvitiMaterialByFile(fileID: string): Observable<RequestResult<any>> {
-      const params = new HttpParams().set('file', fileID);
+    GetMaterialByActivity(activityID: string): Observable<RequestResult<any>> {
+      const params = new HttpParams().set('activity', activityID);
     return this.http
-      .get<RequestResult<any>>(`${apiUrl}/Files/GetActyvitiMaterialByFile`, { params })
+      .get<RequestResult<any>>(`${apiUrl}/Files/GetMaterialByActivity`, { params })
       .pipe(
         retry(0),
         catchError(this.resolveReqSvc.handleError),

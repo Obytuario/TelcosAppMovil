@@ -31,12 +31,6 @@ export class DataService {
       );
   }
 
-  getUsuarios() {
-    return this.http.get('https://jsonplaceholder.typicode.com/users').pipe(
-      delay(2000)
-    );
-  }
-
   handleError(error: Error) {
     return throwError(() => new Error(error.message));
   }

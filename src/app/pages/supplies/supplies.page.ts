@@ -12,4 +12,19 @@ export class SuppliesPage implements OnInit {
   ngOnInit() {
   }
 
+  public toggleTabsBar() {
+    const tabId = document.getElementById('myTabs');
+    if (tabId) {
+      if (tabId.style.display === 'none') {
+        tabId.style.display = 'flex';
+      } else {
+        tabId.style.display = 'none'
+      }
+    }
+  }
+
+  ionViewDidEnter() {
+    this.toggleTabsBar();
+
+  }
 }

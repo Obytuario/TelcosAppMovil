@@ -1,12 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Storage } from '@ionic/storage-angular';
-import { ManageWorkOrder, VariablesManageWorkOrder } from '../../interfaces/interfaces';
+import { ManageWorkOrder, VariablesManageWorkOrder, Masters } from '../../interfaces/interfaces';
 import { Equipment } from './interfaces/interfaceEquipment';
 import { ComponentsService } from '../../services/components.service';
 import { StorageService } from '../../services/storage.service';
 import { EquipmentService } from './services/equipment.service';
 import { AlertController } from '@ionic/angular';
+
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { Router } from '@angular/router';
+import { GlobalService } from 'src/app/services/global.service';
 
 @Component({
   selector: 'app-equipment',
@@ -27,10 +31,23 @@ export class EquipmentPage implements OnInit {
 
   movements: any[] = [];
 
-  constructor(private storage: Storage, public equipmentService: EquipmentService,
+  qrCodeString = 'This is a secret qr code message';
+  scannedResult: any;
+  content_visibility = '';
+  public masters!: Masters;
+  public selectMasters!: Masters;
+
+  scanActive: boolean = false;
+
+  constructor(private storage: Storage,
+    public equipmentService: EquipmentService,
     private comService: ComponentsService,
     private storageService: StorageService,
-    private alertCtrl: AlertController) {
+    private alertCtrl: AlertController,
+    private router: Router,
+    private globalService: GlobalService) {
+
+    this.initializeApp();
 
     this.manageWorkOrder = {
       idWorkOrderDto: '',
@@ -38,9 +55,39 @@ export class EquipmentPage implements OnInit {
       codigoDto: '',
       supplies: [],
       activity: [],
+      photos: [],
       assistants: []
     }
 
+    this.storage.get('masters').then((val) => {
+      if (val !== null) {
+        this.masters = val;
+      } else {
+        this.masters = {
+          activitys: [],
+          materials: [],
+          equipments: []
+        };
+      }
+
+    });
+
+  }
+
+  ionViewDidLeave(){
+    this.stopScan();
+  }
+
+  initializeApp() {
+    this.globalService.getObservable().subscribe((data) => {
+      console.log('Data received', data);
+      this.selectMasters = data;
+      if (data.equipments.length > 0) {
+        this.equipmentForm.patchValue({
+          equipment: data.equipments[0].nombreGeneric
+        });
+      }
+    });
   }
 
   ngOnInit() {
@@ -59,7 +106,7 @@ export class EquipmentPage implements OnInit {
     this.storage.get('manageWorkOrder').then((val) => {
       this.manageWorkOrder = val;
       this.manageWorkOrder.supplies.map(f => {
-        if (f.idActivityDto === this.variablesManageWorkOrder.idActivity) {
+        if (f.idActivityDto === this.variablesManageWorkOrder.idActivityTemp) {
           this.equipmentsArray = f.equipment;
         }
       });
@@ -69,12 +116,19 @@ export class EquipmentPage implements OnInit {
   getVariablesManageWorkOrder() {
     this.storage.get('variablesManageWorkOrder').then((val) => {
       this.variablesManageWorkOrder = val;
-      this.equipmentService.GetActyvitiEquipmentByFile(val.idFolder).subscribe(resp => {
-        this.equipments = resp.result;
-        this.getManageWorkOrder();
-      });
+      if (this.masters?.equipments?.length > 0) {
+        this.equipments = this.masters.equipments;
+      } else {
+        this.equipmentService.GetEquipmentByActivity(val.idActivity).subscribe(resp => {
+          this.equipments = resp.result;
+          this.masters.equipments = this.equipments;
+          this.getManageWorkOrder();
+          this.setMasters();
+        });
+      }
     });
   }
+
 
   get f() {
     return this.equipmentForm.controls;
@@ -96,9 +150,9 @@ export class EquipmentPage implements OnInit {
     if (this.equipmentForm.valid) {
       if (this.validateForm()) {
         const equipment = {
-          idDto: this.equipmentForm.get('equipment')?.value,
-          codeEquipmentDto: this.getEquipment(this.equipmentForm.get('equipment')?.value)?.codigoDto,
-          decriptionEquipmentDto: this.getEquipment(this.equipmentForm.get('equipment')?.value)?.nombreGeneric,
+          idDto: this.selectMasters.equipments[0]?.idParamGenericActividad,
+          codeEquipmentDto: this.selectMasters.equipments[0]?.codigoDto,
+          decriptionEquipmentDto: this.selectMasters.equipments[0]?.nombreGeneric,
           serialDto: this.equipmentForm.get('Serial')?.value,
           idMovement: this.equipmentForm.get('movement')?.value,
           movement: this.getMovement(this.equipmentForm.get('movement')?.value)
@@ -108,13 +162,17 @@ export class EquipmentPage implements OnInit {
         this.equipmentForm.reset();
 
         this.mapEquipments();
+
+        this.selectMasters.equipments = [];
+        this.setSelectMasters();
+
       }
     }
   }
 
   validateForm(): boolean {
 
-    if (this.equipmentsArray?.find(f => f.idDto === this.equipmentForm.get('equipment')?.value && f.serialDto === this.equipmentForm.get('Serial')?.value)?.codeEquipmentDto) {
+    if (this.equipmentsArray?.find(f => f.idDto === this.selectMasters.equipments[0]?.idParamGenericActividad && f.serialDto === this.equipmentForm.get('Serial')?.value)?.codeEquipmentDto) {
       this.presentAlertMultipleButton('Este equipo ya esta asociado');
       return false;
     }
@@ -163,19 +221,19 @@ export class EquipmentPage implements OnInit {
   mapEquipments() {
     if (this.manageWorkOrder.supplies.length === 0) {
       this.manageWorkOrder.supplies = [{
-        idActivityDto: this.variablesManageWorkOrder.idActivity,
+        idActivityDto: this.variablesManageWorkOrder.idActivityTemp,
         equipment: this.equipmentsArray,
         material: []
       }];
-    } else if (!this.manageWorkOrder.supplies.find(f => f.idActivityDto === this.variablesManageWorkOrder.idActivity)?.idActivityDto) {
+    } else if (!this.manageWorkOrder.supplies.find(f => f.idActivityDto === this.variablesManageWorkOrder.idActivityTemp)?.idActivityDto) {
       this.manageWorkOrder.supplies.push({
-        idActivityDto: this.variablesManageWorkOrder.idActivity,
+        idActivityDto: this.variablesManageWorkOrder.idActivityTemp,
         equipment: this.equipmentsArray,
         material: []
       });
     } else {
       this.manageWorkOrder.supplies.map(f => {
-        if (f.idActivityDto === this.variablesManageWorkOrder.idActivity) {
+        if (f.idActivityDto === this.variablesManageWorkOrder.idActivityTemp) {
           f.equipment = this.equipmentsArray;
         }
       });
@@ -184,12 +242,76 @@ export class EquipmentPage implements OnInit {
     this.setManageWorkOrder();
   }
 
+  goToSearch() {
+    this.router.navigate(['/search'], { queryParams: { origin: 'E' } });
+  }
+
+  async setSelectMasters() {
+    await this.storageService.loadSelectMasters(this.selectMasters);
+  }
+
   async setManageWorkOrder() {
     await this.storageService.loadManageWorkOrder(this.manageWorkOrder)
   }
 
-  viewScanner() {
-    console.log('algo');
+  async checkPermission() {
+    try {
+      // check or request permission
+      const status = await BarcodeScanner.checkPermission({ force: true });
+      if (status.granted) {
+        // the user granted permission
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+
+  }
+
+  async startScan() {
+    try {
+      const permission = await this.checkPermission();
+      if (!permission) {
+        return;
+      }
+      this.scanActive = true;
+      await BarcodeScanner.hideBackground();
+      document.querySelector('body')?.classList.add('scanner-active');
+      this.content_visibility = 'hidden';
+      const result = await BarcodeScanner.startScan();
+      console.log(result);
+      BarcodeScanner.showBackground();
+      BarcodeScanner.stopScan();
+      document.querySelector('body')?.classList.remove('scanner-active');
+      this.content_visibility = '';
+      this.scanActive = false;
+      if (result?.hasContent) {
+        this.equipmentForm.get('Serial')?.setValue(result.content);
+        this.scannedResult = result.content;
+        console.log(this.scannedResult);
+      }
+    } catch (e) {
+      console.log(e);
+      this.stopScan();
+    }
+  }
+
+  stopScan() {
+    BarcodeScanner.showBackground();
+    BarcodeScanner.stopScan();
+    document.querySelector('body')?.classList.remove('scanner-active');
+    this.content_visibility = '';
+    this.scanActive = false;
+  }
+
+  async setMasters() {
+    await this.storageService.loadMasters(this.masters);
+  }
+
+  ngOnDestroy(): void {
+    this.stopScan();
   }
 
 }

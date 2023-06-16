@@ -16,28 +16,37 @@
     </ion-list-header>
 
     <ion-row>
-      <ion-col>
+      <ion-col size="10">
 
         <ion-item class="item-select" lines="none">
           <ion-label position="stacked">Materiales:</ion-label>
           <br>
-          <select class="text-small" formControlName="material">
-            <option [value]="null" disabled selected>
-              Seleccione un material
-            </option>
-            <option *ngFor="let material of materials" [value]="material.idParamGenericActividad">
-              {{ material.nombreGeneric }}
-            </option>
-          </select>
+
+          <ion-input type="text" placeholder="Seleccione un material" formControlName="material" required>
+
+          </ion-input>
+
         </ion-item>
+
         <div class="text-tiny ion-text-right">
           <ion-text color="danger">
-            <span
-              [style.visibility]="f['material'].errors?.['required'] && materialFormRef?.submitted ? '' : 'hidden'">
+            <span [style.visibility]="f['material'].errors?.['required'] && materialFormRef?.submitted ? '' : 'hidden'">
               Campo requerido
             </span>
           </ion-text>
         </div>
+
+      </ion-col>
+
+      <ion-col size="2">
+        <br>
+        <br>
+        <ion-button size="small" (click)="goToSearch()" color="telcoSecondary">
+          <ion-icon slot="icon-only" name="search"></ion-icon>
+        </ion-button>
+      </ion-col>
+
+      <ion-col size="12">
 
         <ion-item>
           <ion-label position="floating">Cantidad:</ion-label>

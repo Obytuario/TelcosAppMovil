@@ -47,17 +47,15 @@
               </ion-list-header>
 
               <ion-row>
-                <ion-col>
+                <ion-col size="10">
                   <ion-item class="item-select" lines="none">
                     <ion-label position="stacked">Actividades</ion-label>
-                    <select class="text-small" formControlName="activity">
-                      <option [value]="null" disabled selected>
-                        Seleccione Actividad
-                      </option>
-                      <option *ngFor="let activity of activitys" [value]="activity.idDto">
-                        {{ activity.descripcionDto }}
-                      </option>
-                    </select>
+
+                    <ion-input type="text" placeholder="Seleccione Actividad" formControlName="activity" required>
+
+                    </ion-input>
+
+
                   </ion-item>
                   <ion-text color="danger">
                     <span class="text-tiny"
@@ -65,6 +63,13 @@
                       Campo requerido
                     </span>
                   </ion-text>
+                </ion-col>
+
+                <ion-col size="2">
+                  <br>
+                  <ion-button size="small" (click)="goToSearch()" color="telcoSecondary">
+                    <ion-icon slot="icon-only" name="search"></ion-icon>
+                  </ion-button>
                 </ion-col>
               </ion-row>
 
@@ -99,8 +104,8 @@
                   </ion-item>
                   <ion-text color="danger">
                     <span class="text-tiny"
-                      [style.visibility]="shippingForm.errors?.['required'] && shippingFormRef.submitted ? '' : 'hidden'">
-                      Field required
+                      [style.visibility]="fSh['picture'].errors?.['required'] && shippingFormRef.submitted ? '' : 'hidden'">
+                      campo requerido
                     </span>
                   </ion-text>
                 </ion-col>
@@ -108,14 +113,12 @@
 
               <div class="flex align-items-center full-width ion-margin-top">
                 <div class="ion-margin-end">
-                  <h5 class="text-medium bold">Upload image</h5>
-                  <ion-button (click)="getCamera()" strong shape="round" color="telcoSecondary" size="small">
+                  <h5 class="text-medium bold">Tomar Foto</h5>
+                  <ion-button *ngIf="photoArray.length !== 1" (click)="validateRegister()" strong shape="round" color="telcoSecondary" size="small">
                     Camara
                   </ion-button>
                 </div>
-                <div>
-                  <img class="img-thumb" [src]="imageUrls" *ngIf="imageUrls">
-                </div>
+
               </div>
 
             </form>
@@ -250,7 +253,7 @@
     <ion-item-sliding *ngFor="let activity of activityArray">
 
       <ion-item-options side="start">
-        <ion-item-option color="telcoSecondary" (click)="goToSupplies(activity.idDto)">
+        <ion-item-option color="telcoSecondary" (click)="goToSupplies(activity.idDto, activity.id)">
           <ion-icon slot="top" name="hammer"></ion-icon>
           Agregar Insumos
         </ion-item-option>
@@ -272,7 +275,7 @@
       </ion-item>
 
       <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="deleteActivity(activity.idDto)">
+        <ion-item-option color="danger" (click)="deleteActivity(activity.id)">
           <ion-icon slot="top" name="trash"></ion-icon>
           Eliminar
         </ion-item-option>
@@ -282,7 +285,29 @@
 
   </ion-list>
 
+  <div *ngIf="slidesIf === 'Registro'">
 
+    <ion-card *ngFor="let photo of this.photoArray">
+      <ion-card-subtitle class="ion-margin">
+
+        <ion-row class="ion-aling-items-center">
+          <ion-col class="ion-margin">
+            <span class="text-primary">{{ photo.descripcionDto }} </span>
+          </ion-col>
+
+          <ion-col align="right">
+            <ion-button (click)="deletePhoto(photo.idDto)" fill="clear" color="danger">
+              <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-button>
+          </ion-col>
+
+        </ion-row>
+
+      </ion-card-subtitle>
+
+      <img [src]="GetSanitizer(photo.imageUrl)" alt="">
+    </ion-card>
+  </div>
 
 </ion-content>
 

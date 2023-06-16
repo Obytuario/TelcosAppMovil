@@ -8,13 +8,16 @@ import { EquipmentPageRoutingModule } from './equipment-routing.module';
 
 import { EquipmentPage } from './equipment.page';
 
+import { QRCodeModule } from 'angularx-qrcode';
+
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
     EquipmentPageRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    QRCodeModule
   ],
   declarations: [EquipmentPage]
 })

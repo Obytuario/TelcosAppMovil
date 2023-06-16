@@ -32,7 +32,7 @@ export class WorkOrderPage implements OnInit {
   public session!: Session;
 
   public update: boolean = false;
-  public title:  string = 'Crear orden de trabajo';
+  public title: string = 'Crear orden de trabajo';
 
   constructor(private router: Router, private comService: ComponentsService,
     private genericService: GenericsService, private storage: Storage,
@@ -144,26 +144,30 @@ export class WorkOrderPage implements OnInit {
         .subscribe(resp => {
           if (resp.isSuccessful) {
             this.dismissLoading();
-            this.presentAlertMultipleButton();
+            this.presentAlertMultipleButton('ORDEN CREADA', true);
           } else {
             this.dismissLoading();
+            this.presentAlertMultipleButton(resp.messages[0], false);
           }
         });
     }
   }
 
-  async presentAlertMultipleButton() {
-    const alert = await this.alertCtrl.create({
-      header: 'ORDEN CREADA',
-      buttons: [
-        {
-          text: 'Ok',
-          role: 'confirm',
-          handler: () => {
-            this.router.navigate(['/home'], { queryParams: { refresh: true } });
-          },
+  async presentAlertMultipleButton(message: string, buttons: boolean) {
+
+    const buttonOK = (buttons) ? [
+      {
+        text: 'Ok',
+        role: 'confirm',
+        handler: () => {
+          this.router.navigate(['/home'], { queryParams: { refresh: true } });
         },
-      ],
+      },
+    ] : [];
+
+    const alert = await this.alertCtrl.create({
+      header: message,
+      buttons: buttonOK,
     });
 
     await alert.present();

@@ -42,6 +42,7 @@ export interface Master {
 
 export interface VariablesManageWorkOrder {
   idFolder: string;
+  idActivityTemp: string;
   idActivity: string;
 }
 
@@ -52,6 +53,7 @@ export class ManageWorkOrder {
   codigoDto: string;
   supplies: Supplies[];
   activity: Activity[];
+  photos: any[];
   assistants: any[];
 
   constructor() {
@@ -60,6 +62,7 @@ export class ManageWorkOrder {
     this.codigoDto = '';
     this.supplies = [];
     this.activity = [];
+    this.photos = [];
     this.assistants = [];
   }
 }
@@ -70,3 +73,17 @@ export interface Supplies {
   material?: Material[],
   equipment?: Equipment[]
 }
+
+export class Masters {
+
+  activitys: any[];
+  materials: any[];
+  equipments: any[];
+
+  constructor() {
+    this.activitys = [];
+    this.materials = [];
+    this.equipments = [];
+  }
+}
+
