@@ -7,6 +7,7 @@ import { Login, Session } from '../../interfaces/interfaces';
 import { StorageService } from '../../services/storage.service';
 import { ComponentsService } from '../../services/components.service';
 import { Geolocation } from '@capacitor/geolocation';
+import { GlobalService } from 'src/app/services/global.service';
 
 @Component({
   selector: 'app-login',
@@ -25,7 +26,8 @@ export class LoginPage implements OnInit {
   public coordinates: any;
 
   constructor(private router: Router, private dataService: DataService,
-    private storageService: StorageService, private comService: ComponentsService) {
+    private storageService: StorageService, private comService: ComponentsService,
+    private globalService: GlobalService) {
 
     this.getLocation();
 
@@ -76,6 +78,7 @@ export class LoginPage implements OnInit {
           if (resp.isSuccessful) {
             this.setSession(resp.result);
             this.dismissLoading();
+            this.globalService.sendLocation();
             this.router.navigate(['/home']);
           } else {
             this.dismissLoading();

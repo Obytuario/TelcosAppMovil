@@ -4,6 +4,9 @@ export interface SaveOrderWorkIN {
   suscriptorDTO: SuscriptorDTO;
   folderDto: string;
   operationCenterDto?: string;
+  latitude: string;
+  longitude: string;
+  nodo: string;
 }
 
 export interface SuscriptorDTO {

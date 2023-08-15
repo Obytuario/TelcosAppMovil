@@ -92,6 +92,11 @@
         <ion-item>
           <ion-label position="floating">Dirección:</ion-label>
           <ion-input type="text" placeholder="Dirección" formControlName="address" required></ion-input>
+
+          <ion-button (click)="getGeocode()" slot="end" expand="block" color="telcoSecondary">
+            <ion-icon slot="icon-only" name="locate-outline"></ion-icon>
+          </ion-button>
+
         </ion-item>
         <div class="text-tiny ion-text-right">
           <ion-text color="danger">
@@ -140,6 +145,18 @@
         <div class="text-tiny ion-text-right">
           <ion-text color="danger">
             <span [style.visibility]="f['folder'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
+              Campo requerido
+            </span>
+          </ion-text>
+        </div>
+
+        <ion-item>
+          <ion-label position="floating">Nodo:</ion-label>
+          <ion-input type="text" placeholder="Nodo" formControlName="nodo" required></ion-input>
+        </ion-item>
+        <div class="text-tiny ion-text-right" *ngIf="codSubscriberType">
+          <ion-text color="danger">
+            <span [style.visibility]="f['nodo'].errors?.['required'] && workOrderFormRef?.submitted ? '' : 'hidden'">
               Campo requerido
             </span>
           </ion-text>

@@ -111,20 +111,9 @@
                 </ion-col>
               </ion-row>
 
-              <div class="flex align-items-center full-width ion-margin-top">
-                <div class="ion-margin-end">
-                  <h5 class="text-medium bold">Tomar Foto</h5>
-                  <ion-button *ngIf="photoArray.length !== 1" (click)="validateRegister()" strong shape="round" color="telcoSecondary" size="small">
-                    Camara
-                  </ion-button>
-                </div>
-
-              </div>
-
             </form>
 
             <form [formGroup]="paymentForm" #paymentFormRef="ngForm" novalidate *ngIf="slide === 'Cierre'">
-
 
               <ion-list-header class="ion-no-padding" style="min-height: auto;">
                 <ion-label class="ion-text-center" color="telcoSecondary">
@@ -286,6 +275,16 @@
   </ion-list>
 
   <div *ngIf="slidesIf === 'Registro'">
+
+    <div class="flex align-items-center full-width ion-margin-top">
+      <div class="ion-margin-end">
+        <h5 class="text-medium bold">Tomar Foto</h5>
+        <ion-button *ngIf="photoArray.length !== 2" (click)="validateRegister()" strong shape="round" color="telcoSecondary" size="small">
+          Camara
+        </ion-button>
+      </div>
+
+    </div>
 
     <ion-card *ngFor="let photo of this.photoArray">
       <ion-card-subtitle class="ion-margin">

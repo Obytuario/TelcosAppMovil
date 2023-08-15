@@ -66,7 +66,6 @@ export class SearchPage implements OnInit {
   }
 
   onSearchChange(ev: any) {
-    console.log(ev.detail);
     this.textoBuscar = ev.detail.value;
   }
 

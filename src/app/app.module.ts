@@ -11,6 +11,8 @@ import { AppComponent } from './app.component';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { InterceptorService } from './services/interceptor.service';
 
+import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@awesome-cordova-plugins/native-geocoder/ngx';
+
 @NgModule({
   declarations: [AppComponent],
   imports: [
@@ -21,6 +23,7 @@ import { InterceptorService } from './services/interceptor.service';
     IonicStorageModule.forRoot()
   ],
   providers: [
+    NativeGeocoder,
     {
       provide: RouteReuseStrategy,
       useClass: IonicRouteStrategy

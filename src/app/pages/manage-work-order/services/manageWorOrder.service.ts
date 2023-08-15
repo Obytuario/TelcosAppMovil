@@ -16,9 +16,10 @@ export class ManageWorkOrderService {
     private readonly resolveReqSvc: ResolveRequestResultService) { }
 
 
-  GetActivity(): Observable<RequestResult<any>> {
+  GetActivity(idFolder: string): Observable<RequestResult<any>> {
+    const params = new HttpParams().set('carpeta', idFolder);
     return this.http
-      .get<RequestResult<any>>(`${apiUrl}/WorkOrderFollowUp/GetActivity`)
+      .get<RequestResult<any>>(`${apiUrl}/WorkOrderFollowUp/GetActivity`, { params })
       .pipe(
         retry(0),
         catchError(this.resolveReqSvc.handleError),

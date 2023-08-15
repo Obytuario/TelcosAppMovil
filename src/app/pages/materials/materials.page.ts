@@ -66,7 +66,6 @@ export class MaterialsPage implements OnInit {
 
   initializeApp() {
     this.globalService.getObservable().subscribe((data) => {
-      console.log('Data received', data);
       this.selectMasters = data;
       if (data.materials.length > 0) {
         this.materialForm.patchValue({

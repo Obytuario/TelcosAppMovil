@@ -29,6 +29,12 @@ export interface Login {
   longitude:number;
 }
 
+export interface SaveLocationUser {
+  idUser: string;
+  latitude: number;
+  longitude:number;
+}
+
 export interface Session {
   token: string;
   userID: string;

@@ -9,6 +9,7 @@ import { VariablesManageWorkOrder, ManageWorkOrder, Session, Masters } from '../
 import { ManageWorkOrderService } from './services/manageWorOrder.service';
 import { Activity, Photo } from './interface/interfaceManageWorkOrder';
 import { Camera, CameraResultType } from '@capacitor/camera';
+import { ComponentsService } from '../../services/components.service';
 
 
 @Component({
@@ -71,7 +72,7 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
     private storage: Storage,
     private storageService: StorageService,
     private manageWorkOrderService: ManageWorkOrderService,
-    private alertCtrl: AlertController) {
+    private alertCtrl: AlertController, private comService: ComponentsService) {
     this.route.queryParams.subscribe(params => {
       if (params['update'] || '') {
         this.update = true;
@@ -118,16 +119,16 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.setupForm();
     this.buildSlides();
-    if (this.masters?.activitys?.length > 0) {
-      this.activitys = this.masters.activitys;
-    } else {
-      this.manageWorkOrderService.GetActivity().subscribe(resp => {
+    // if (this.masters?.activitys?.length > 0) {
+    //   this.activitys = this.masters.activitys;
+    // } else {
+      this.manageWorkOrderService.GetActivity(this.idFolder).subscribe(resp => {
         this.activitys = resp.result;
         this.masters.activitys = this.activitys;
         this.setMasters();
 
       });
-    }
+    //}
 
 
     this.manageWorkOrderService.GetPhotoType().subscribe(resp => {
@@ -171,7 +172,6 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
         this.billingForm.patchValue({
           activity: val.activitys[0].descripcionDto
         });
-        console.log('management', val);
       }
     });
   }
@@ -234,12 +234,13 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
   }
 
   goToHome() {
-
+    this.showLoading();
     this.getManageWorkOrder().then((val: ManageWorkOrder) => {
       const manageWorkOrder = val;
 
       let equiL: any[] = [];
       let matL: any[] = [];
+      let photoL: any[] = [];
 
       if(manageWorkOrder.supplies.length > 0){
         manageWorkOrder.supplies[0].equipment?.forEach((e: any) => {
@@ -264,34 +265,50 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
         });
       }
 
+      if(manageWorkOrder.photos.length > 0){
+        manageWorkOrder.photos?.forEach((e: any) => {
+          const photo = {
+
+            photoBase64String: e.base64String,
+            idTipoPhoto: e.idDto
+          }
+          photoL.push(photo);
+
+        });
+      }
+
       const updateManageWorkOrder = {
         idWorkOrder: manageWorkOrder.idWorkOrderDto,
         idAssitant: manageWorkOrder.assistants[0]?.idDto,
         idUser: this.session.userID,
+        photos: photoL,
         supplies: {
           equiptments: equiL,
           materials: matL
-        }
+        },
+        activitys: manageWorkOrder.activity
       };
 
-      this.manageWorkOrderService.UpdateManageWorkOrder(updateManageWorkOrder).subscribe(resp => {
-        if (resp.isSuccessful) {
-          this.ionSlides.slideTo(0, 100);
-          this.clearStorage();
-          this.manageWorkOrder = {
-            idWorkOrderDto: '',
-            idfolderDto: '',
-            codigoDto: '',
-            supplies: [],
-            activity: [],
-            photos: [],
-            assistants: []
-          }
-          this.router.navigate(['/home'], { queryParams: { refresh: true } });
-        } else {
-          this.presentAlertMultipleButton('No se puede gestionar la orden');
-        }
-      });
+    //   this.manageWorkOrderService.UpdateManageWorkOrder(updateManageWorkOrder).subscribe(resp => {
+    //     if (resp.isSuccessful) {
+    //       this.ionSlides.slideTo(0, 100);
+    //       this.clearStorage();
+    //       this.manageWorkOrder = {
+    //         idWorkOrderDto: '',
+    //         idfolderDto: '',
+    //         codigoDto: '',
+    //         supplies: [],
+    //         activity: [],
+    //         photos: [],
+    //         assistants: []
+    //       }
+           this.dismissLoading();
+    //       this.router.navigate(['/home'], { queryParams: { refresh: true } });
+    //     } else {
+    //       this.dismissLoading();
+    //       this.presentAlertMultipleButton('No se puede gestionar la orden');
+    //     }
+    //   });
     });
   }
 
@@ -387,7 +404,7 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
 
     } else if (this.currentSlide === 'Registro') {
 
-      if (this.photoArray.length === 1) {
+      if (this.photoArray.length >= 1) {
         this.ionSlides.slideNext();
         this.ionContent.scrollToTop();
         this.slidesIf = 'Cierre';
@@ -418,7 +435,7 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
       this.presentAlertMultipleButton('Debe asociar una actividad');
       return false;
     }
-    //else if (this.validateSupplies()) {
+    // else if (this.validateSupplies()) {
     //   return false;
     // }
 
@@ -504,8 +521,6 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
       imageUrl: imageUrl
     }
 
-    console.log(imageUrl);
-
     this.photoArray.push(photo);
 
     this.shippingFormRef.resetForm();
@@ -568,6 +583,14 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
     });
 
     await alert.present();
+  }
+
+  showLoading() {
+    this.comService.showLoading();
+  }
+
+  dismissLoading() {
+    this.comService.dismissLoading();
   }
 
   ngOnDestroy(): void {

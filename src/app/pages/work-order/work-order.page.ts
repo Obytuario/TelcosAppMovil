@@ -8,7 +8,10 @@ import { Observable } from 'rxjs';
 import { SaveOrderWorkIN } from './interfaces/interfacesWorkOrder';
 import { Storage } from '@ionic/storage-angular';
 import { WorkOrderService } from './services/workOrder.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
+import { Geolocation } from '@capacitor/geolocation';
+import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@awesome-cordova-plugins/native-geocoder/ngx';
+import { ModalInfoComponent } from 'src/app/components/modal-info/modal-info.component';
 
 @Component({
   selector: 'app-work-order',
@@ -34,10 +37,19 @@ export class WorkOrderPage implements OnInit {
   public update: boolean = false;
   public title: string = 'Crear orden de trabajo';
 
+  public coordinates: any;
+  public addressArray: string[] = [];
+
   constructor(private router: Router, private comService: ComponentsService,
     private genericService: GenericsService, private storage: Storage,
     private workOrderService: WorkOrderService, private alertCtrl: AlertController,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,
+    private modalCtrl: ModalController,
+    //private nativeGeocoder: NativeGeocoder
+  ) {
+
+    this.getLocation();
+
     this.route.queryParams.subscribe(params => {
       if (params['update'] || '') {
         this.update = true;
@@ -50,6 +62,9 @@ export class WorkOrderPage implements OnInit {
           numeroOrdenDto: (params['numeroOrdenDto'] || ''),
           usuarioRegistraDto: '',
           operationCenterDto: (params['idCentroOperacionDto'] || ''),
+          latitude: '',
+          longitude: '',
+          nodo: (params['node'] || ''),
           folderDto: (params['idCarpetaDto'] || ''),
           suscriptorDTO: {
             nombreDTO: (params['nombreSuscriptorDto'] || ''),
@@ -62,6 +77,57 @@ export class WorkOrderPage implements OnInit {
         }
       }
 
+    });
+  }
+
+  async getLocation() {
+    const permissions = await Geolocation.checkPermissions();
+
+    if (permissions.coarseLocation === "denied") {
+      const request = await Geolocation.requestPermissions();
+    } else {
+      this.coordinates = await Geolocation.getCurrentPosition();
+    }
+  }
+
+  getGeocode() {
+
+    let options: NativeGeocoderOptions = {
+      useLocale: true,
+      maxResults: 5
+    };
+
+    this.addressArray = [];
+
+    // this.nativeGeocoder.reverseGeocode(this.coordinates.coords.latitude, this.coordinates.coords.longitude, options)
+    //   .then((result: NativeGeocoderResult[]) => {
+
+    //     let resultGeo = result;
+    //     console.log(resultGeo)
+    //     resultGeo.forEach((e: any) => {
+    //       this.addressArray.push(e.addressLines[0].split(",")[0])
+    //       console.log(e.addressLines[0].split(",")[0]);
+    //     });
+    //   })
+    //   .catch((error: any) => console.log(error));
+
+    this.mostrarModal();
+  }
+
+  async mostrarModal() {
+    const modal = await this.modalCtrl.create({
+      component: ModalInfoComponent,
+      componentProps: {
+        dinamycArry: this.addressArray
+      }
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    this.workOrderForm.patchValue({
+      address: data.address
     });
   }
 
@@ -93,8 +159,8 @@ export class WorkOrderPage implements OnInit {
       address: new FormControl(null, Validators.required),
       account: new FormControl(null, Validators.required),
       workOrder: new FormControl(null, Validators.required),
-      folder: new FormControl(null, Validators.required)
-
+      folder: new FormControl(null, Validators.required),
+      nodo: new FormControl(null, Validators.required)
     });
   }
 
@@ -108,7 +174,8 @@ export class WorkOrderPage implements OnInit {
       businessName: this.getOrderWorkIN.suscriptorDTO.nombreDTO,
       name: this.getOrderWorkIN.suscriptorDTO.nombreDTO,
       lastName: this.getOrderWorkIN.suscriptorDTO.apellidoDTO,
-      address: this.getOrderWorkIN.suscriptorDTO.direccionDto
+      address: this.getOrderWorkIN.suscriptorDTO.direccionDto,
+      nodo: this.getOrderWorkIN.nodo
     });
     this.workOrderForm.disable();
   }
@@ -132,6 +199,9 @@ export class WorkOrderPage implements OnInit {
         usuarioRegistraDto: this.session.userID,
         operationCenterDto: this.workOrderForm.get('operationCenter')?.value,
         folderDto: this.workOrderForm.get('folder')?.value,
+        latitude: this.coordinates.coords.latitude,
+        longitude: this.coordinates.coords.longitude,
+        nodo: this.workOrderForm.get('nodo')?.value,
         suscriptorDTO: {
           nombreDTO: (this.codSubscriberType) ? this.workOrderForm.get('name')?.value : this.workOrderForm.get('businessName')?.value,
           apellidoDTO: this.workOrderForm.get('lastName')?.value,
@@ -218,5 +288,7 @@ export class WorkOrderPage implements OnInit {
   dismissLoading() {
     this.comService.dismissLoading();
   }
+
+
 
 }

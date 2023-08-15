@@ -80,7 +80,6 @@ export class EquipmentPage implements OnInit {
 
   initializeApp() {
     this.globalService.getObservable().subscribe((data) => {
-      console.log('Data received', data);
       this.selectMasters = data;
       if (data.equipments.length > 0) {
         this.equipmentForm.patchValue({
@@ -173,7 +172,7 @@ export class EquipmentPage implements OnInit {
   validateForm(): boolean {
 
     if (this.equipmentsArray?.find(f => f.idDto === this.selectMasters.equipments[0]?.idParamGenericActividad && f.serialDto === this.equipmentForm.get('Serial')?.value)?.codeEquipmentDto) {
-      this.presentAlertMultipleButton('Este equipo ya esta asociado');
+      this.presentAlertMultipleButton('Este serializado ya esta asociado');
       return false;
     }
 
@@ -264,7 +263,6 @@ export class EquipmentPage implements OnInit {
       }
       return false;
     } catch (e) {
-      console.log(e);
       return false;
     }
 
@@ -281,19 +279,18 @@ export class EquipmentPage implements OnInit {
       document.querySelector('body')?.classList.add('scanner-active');
       this.content_visibility = 'hidden';
       const result = await BarcodeScanner.startScan();
-      console.log(result);
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
       document.querySelector('body')?.classList.remove('scanner-active');
       this.content_visibility = '';
       this.scanActive = false;
       if (result?.hasContent) {
-        this.equipmentForm.get('Serial')?.setValue(result.content);
+        this.equipmentForm.patchValue({
+          Serial: result.content
+        });
         this.scannedResult = result.content;
-        console.log(this.scannedResult);
       }
     } catch (e) {
-      console.log(e);
       this.stopScan();
     }
   }

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonList, IonPopover, LoadingController, PopoverController } from '@ionic/angular';
+import { AlertController, IonList, IonPopover, LoadingController, PopoverController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { DataService } from '../../services/data.service';
 import { PopoverInfoComponent } from '../../components/popover-info/popover-info.component';
@@ -37,7 +37,8 @@ export class HomePage implements OnInit {
     private storage: Storage,
     private route: ActivatedRoute,
     private comService: ComponentsService,
-    private storageService: StorageService) {
+    private storageService: StorageService,
+    private alertCtrl: AlertController) {
 
     this.platform.backButton.subscribeWithPriority(10, () => {
       this.presentPopover();
@@ -75,8 +76,10 @@ export class HomePage implements OnInit {
     this.showLoading()
     this.homeService.GetWorkOrderByUser(userID).subscribe(resp => {
       this.workOrders = resp.result;
-      if ((this.workOrders || []).length > 0)
+      if ((this.workOrders || []).length <= 0) {
         this.validateLengthData = false;
+        this.presentAlertMultipleButton('No cuenta con ordenes creadas', true);
+      }
 
       this.dismissLoading();
     });
@@ -118,7 +121,8 @@ export class HomePage implements OnInit {
         nombreSuscriptorDto: workOrder.nombreSuscriptorDto,
         apellidoSuscriptorDto: workOrder.apellidoSuscriptorDto,
         idCodigoTipoSuscriptorDto: workOrder.idCodigoTipoSuscriptorDto,
-        direccionSuscriptorDto: workOrder.direccionSuscriptorDto
+        direccionSuscriptorDto: workOrder.direccionSuscriptorDto,
+        node: workOrder.node
       }
     });
 
@@ -151,6 +155,26 @@ export class HomePage implements OnInit {
 
   dismissLoading() {
     this.comService.dismissLoading();
+  }
+
+  async presentAlertMultipleButton(message: string, buttons: boolean) {
+
+    const buttonOK = (buttons) ? [
+      {
+        text: 'Crear orden',
+        role: 'confirm',
+        handler: () => {
+          this.router.navigate(['/work-order']);
+        },
+      },
+    ] : [];
+
+    const alert = await this.alertCtrl.create({
+      header: message,
+      buttons: buttonOK,
+    });
+
+    await alert.present();
   }
 
   async setVariablesManageWorkOrder() {
