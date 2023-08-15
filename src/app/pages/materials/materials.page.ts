@@ -56,7 +56,8 @@ export class MaterialsPage implements OnInit {
         this.masters = {
           activitys: [],
           materials: [],
-          equipments: []
+          equipments: [],
+          assistants: []
         };
       }
 

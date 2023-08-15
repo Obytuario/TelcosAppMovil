@@ -67,7 +67,7 @@
 
                 <ion-col size="2">
                   <br>
-                  <ion-button size="small" (click)="goToSearch()" color="telcoSecondary">
+                  <ion-button size="small" (click)="goToSearch('A')" color="telcoSecondary">
                     <ion-icon slot="icon-only" name="search"></ion-icon>
                   </ion-button>
                 </ion-col>
@@ -122,17 +122,18 @@
               </ion-list-header>
 
               <ion-row>
-                <ion-col>
+                <ion-col size="10">
                   <ion-item lines="none">
                     <ion-label position="stacked">Auxiliar</ion-label>
-                    <select class="text-small" formControlName="assistant">
+                    <ion-input type="text" placeholder="Seleccione Auxiliar" formControlName="assistant" required></ion-input>
+                    <!-- <select class="text-small" formControlName="assistant">
                       <option [value]="null" disabled selected>
                         Seleccione Auxiliar
                       </option>
                       <option *ngFor="let assistant of assistants" [value]="assistant.id">
                         {{ assistant.fName + ' ' + assistant.lName }}
                       </option>
-                    </select>
+                    </select> -->
                   </ion-item>
                   <ion-text color="danger">
                     <span class="text-tiny"
@@ -140,6 +141,13 @@
                       Campo requerido
                     </span>
                   </ion-text>
+                </ion-col>
+
+                <ion-col size="2">
+                  <br>
+                  <ion-button size="small" (click)="goToSearch('X')" color="telcoSecondary">
+                    <ion-icon slot="icon-only" name="search"></ion-icon>
+                  </ion-button>
                 </ion-col>
               </ion-row>
 

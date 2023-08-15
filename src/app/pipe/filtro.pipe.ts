@@ -39,6 +39,12 @@ export class FiltroPipe implements PipeTransform {
     else if (origin == 'E') {
       arryTemp = this.masters.equipments;
     }
+    else if (origin == 'X') {
+      arryTemp = this.masters.assistants;
+      arryTemp.forEach(e=> {
+        e.nombreGeneric = e.fName + ' ' + e.lName;
+      });
+    }
 
     return arryTemp.filter(
       item => item[columna].toLowerCase().includes(texto)

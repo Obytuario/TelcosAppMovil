@@ -16,7 +16,8 @@
   <ion-list>
     <ion-item *ngFor="let item of dinamycArry | filtro: textoBuscar : origin : columna">
       <ion-label *ngIf="origin === 'A'" (click)="selectActivity(item)">{{item.descripcionDto}}</ion-label>
-      <ion-label *ngIf="origin !== 'A'" (click)="selectActivity(item)">{{item.nombreGeneric}}</ion-label>
+      <ion-label *ngIf="origin === 'E' || origin === 'M'" (click)="selectActivity(item)">{{item.nombreGeneric}}</ion-label>
+      <ion-label *ngIf="origin === 'X'" (click)="selectActivity(item)">{{item.fName + ' ' + item.lName}}</ion-label>
     </ion-item>
   </ion-list>
 

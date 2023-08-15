@@ -39,6 +39,10 @@ export class SearchPage implements OnInit {
             arryTemp = val.equipments;
             this.columna = 'nombreGeneric';
           }
+          else if (this.origin == 'X') {
+            arryTemp = val.assistants;
+            this.columna = 'nombreGeneric';
+          }
 
           for (let index = 0; index < 20; index++) {
             const element = arryTemp[index];
@@ -57,7 +61,8 @@ export class SearchPage implements OnInit {
     this.selectMaster = {
       activitys: [],
       materials: [],
-      equipments: []
+      equipments: [],
+      assistants: []
     };
 
   }
@@ -82,6 +87,10 @@ export class SearchPage implements OnInit {
     else if (this.origin == 'E') {
       this.selectMaster.equipments.push(item);
       path = '/supplies/equipment';
+    }
+    else if (this.origin == 'X') {
+      this.selectMaster.assistants.push(item);
+      path = '/manage-work-order';
     }
 
     this.globalService.publishSomeData(this.selectMaster);

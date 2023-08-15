@@ -89,7 +89,8 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
         this.masters = {
           activitys: [],
           materials: [],
-          equipments: []
+          equipments: [],
+          assistants: []
         };
       }
 
@@ -125,8 +126,6 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
       this.manageWorkOrderService.GetActivity(this.idFolder).subscribe(resp => {
         this.activitys = resp.result;
         this.masters.activitys = this.activitys;
-        this.setMasters();
-
       });
     //}
 
@@ -137,6 +136,8 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
 
     this.manageWorkOrderService.GetAllUsersByRolCode('TECX').subscribe(resp => {
       this.assistants = resp.result;
+      this.masters.assistants = this.assistants;
+      this.setMasters();
     });
 
   }
@@ -172,7 +173,13 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
         this.billingForm.patchValue({
           activity: val.activitys[0].descripcionDto
         });
+      }else if(val.assistants.length > 0){
+        this.paymentForm.patchValue({
+          assistant: val.assistants[0].fName + ' ' + val.assistants[0].lName
+        });
+        this.currentSlide = 'Cierre';
       }
+
     });
   }
 
@@ -229,8 +236,8 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
     this.router.navigate(['/supplies']);
   }
 
-  goToSearch() {
-    this.router.navigate(['/search'], { queryParams: { origin: 'A' } });
+  goToSearch(origin: string) {
+    this.router.navigate(['/search'], { queryParams: { origin: origin } });
   }
 
   goToHome() {
@@ -241,6 +248,7 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
       let equiL: any[] = [];
       let matL: any[] = [];
       let photoL: any[] = [];
+      let activitys: string[] = [];
 
       if(manageWorkOrder.supplies.length > 0){
         manageWorkOrder.supplies[0].equipment?.forEach((e: any) => {
@@ -277,6 +285,13 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
         });
       }
 
+      if(manageWorkOrder.activity.length > 0){
+        manageWorkOrder.activity?.forEach((e: any) => {
+          activitys.push(e.idDto);
+
+        });
+      }
+
       const updateManageWorkOrder = {
         idWorkOrder: manageWorkOrder.idWorkOrderDto,
         idAssitant: manageWorkOrder.assistants[0]?.idDto,
@@ -286,29 +301,29 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
           equiptments: equiL,
           materials: matL
         },
-        activitys: manageWorkOrder.activity
+        activitys: activitys
       };
 
-    //   this.manageWorkOrderService.UpdateManageWorkOrder(updateManageWorkOrder).subscribe(resp => {
-    //     if (resp.isSuccessful) {
-    //       this.ionSlides.slideTo(0, 100);
-    //       this.clearStorage();
-    //       this.manageWorkOrder = {
-    //         idWorkOrderDto: '',
-    //         idfolderDto: '',
-    //         codigoDto: '',
-    //         supplies: [],
-    //         activity: [],
-    //         photos: [],
-    //         assistants: []
-    //       }
+      this.manageWorkOrderService.UpdateManageWorkOrder(updateManageWorkOrder).subscribe(resp => {
+        if (resp.isSuccessful) {
+          this.ionSlides.slideTo(0, 100);
+          this.clearStorage();
+          this.manageWorkOrder = {
+            idWorkOrderDto: '',
+            idfolderDto: '',
+            codigoDto: '',
+            supplies: [],
+            activity: [],
+            photos: [],
+            assistants: []
+          }
            this.dismissLoading();
-    //       this.router.navigate(['/home'], { queryParams: { refresh: true } });
-    //     } else {
-    //       this.dismissLoading();
-    //       this.presentAlertMultipleButton('No se puede gestionar la orden');
-    //     }
-    //   });
+          this.router.navigate(['/home'], { queryParams: { refresh: true } });
+        } else {
+          this.dismissLoading();
+          this.presentAlertMultipleButton('No se puede gestionar la orden');
+        }
+      });
     });
   }
 
@@ -339,11 +354,10 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
   }
 
   validateFormActivity(): boolean {
-    //Se comenta la validación de actividad repetida
-    // if (this.activityArray?.find(f => f.idDto === this.selectMasters.activitys[0].idDto)?.codigoDto) {
-    //   this.presentAlertMultipleButton('Esta actividad ya esta asociada');
-    //   return false;
-    // }
+    if (this.activityArray?.find(f => f.idDto === this.selectMasters.activitys[0].idDto)?.codigoDto) {
+      this.presentAlertMultipleButton('Esta actividad ya esta asociada');
+      return false;
+    }
 
     return true;
   }
@@ -366,9 +380,9 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
     if (this.paymentForm.valid) {
       if (this.assistantArray.length == 0) {
         const assistant = {
-          idDto: this.paymentForm.get('assistant')?.value,
-          descripcionDto: this.getAssistant(this.paymentForm.get('assistant')?.value)?.fName + ' ' + this.getAssistant(this.paymentForm.get('assistant')?.value)?.lName,
-          codigoDto: this.getAssistant(this.paymentForm.get('assistant')?.value)?.numberDocument
+          idDto: this.selectMasters.assistants[0]?.id,
+          descripcionDto: this.selectMasters.assistants[0]?.fName + ' ' + this.selectMasters.assistants[0]?.lName,
+          codigoDto: this.selectMasters.assistants[0]?.numberDocument
         }
         this.assistantArray.push(assistant);
         this.paymentFormRef.resetForm();
@@ -376,6 +390,9 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
 
         this.manageWorkOrder.assistants = this.assistantArray;
         this.setManageWorkOrder();
+
+        this.selectMasters.assistants = [];
+        this.setSelectMasters();
       }
     }
   }

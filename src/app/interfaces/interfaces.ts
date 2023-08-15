@@ -85,11 +85,13 @@ export class Masters {
   activitys: any[];
   materials: any[];
   equipments: any[];
+  assistants: any[];
 
   constructor() {
     this.activitys = [];
     this.materials = [];
     this.equipments = [];
+    this.assistants = [];
   }
 }
 
