@@ -45,7 +45,7 @@ export class WorkOrderPage implements OnInit {
     private workOrderService: WorkOrderService, private alertCtrl: AlertController,
     private route: ActivatedRoute,
     private modalCtrl: ModalController,
-    private nativeGeocoder: NativeGeocoder
+    //private nativeGeocoder: NativeGeocoder
   ) {
 
     this.getLocation();
@@ -99,17 +99,15 @@ export class WorkOrderPage implements OnInit {
 
     this.addressArray = [];
 
-    this.nativeGeocoder.reverseGeocode(this.coordinates.coords.latitude, this.coordinates.coords.longitude, options)
-      .then((result: NativeGeocoderResult[]) => {
+    // this.nativeGeocoder.reverseGeocode(this.coordinates.coords.latitude, this.coordinates.coords.longitude, options)
+    //   .then((result: NativeGeocoderResult[]) => {
 
-        let resultGeo = result;
-        console.log(resultGeo)
-        resultGeo.forEach((e: any) => {
-          this.addressArray.push(e.addressLines[0].split(",")[0])
-          console.log(e.addressLines[0].split(",")[0]);
-        });
-      })
-      .catch((error: any) => console.log(error));
+    //     let resultGeo = result;
+    //     resultGeo.forEach((e: any) => {
+    //       this.addressArray.push(e.addressLines[0].split(",")[0])
+    //     });
+    //   })
+    //   .catch((error: any) => console.log(error));
 
     this.mostrarModal();
   }

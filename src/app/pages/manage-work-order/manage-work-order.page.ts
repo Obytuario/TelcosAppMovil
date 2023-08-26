@@ -79,6 +79,7 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
       }
 
       this.idFolder = (params['idCarpetaDto'] || '');
+      this.callManageWorkOrder();
 
     });
 
@@ -251,24 +252,27 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
       let activitys: string[] = [];
 
       if(manageWorkOrder.supplies.length > 0){
-        manageWorkOrder.supplies[0].equipment?.forEach((e: any) => {
-          let equi = {
+        manageWorkOrder.supplies?.forEach(s => {
+          s.equipment?.forEach((e: any) => {
+            let equi = {
 
-            paramEquipoDto: e.idDto,
-            serialDto: e.serialDto,
-            idMovimientoDto: e.idMovement
-          }
-          equiL.push(equi);
+              paramEquipoDto: e.idDto,
+              serialDto: e.serialDto,
+              idMovimientoDto: e.idMovement
+            }
+            equiL.push(equi);
 
-        });
+          });
 
-        manageWorkOrder.supplies[0].material?.forEach((e: any) => {
-          const mat = {
+          s.material?.forEach((e: any) => {
+            const mat = {
 
-            paramMaterialDto: e.idDto,
-            cantidadDto: e.quantityDto
-          }
-          matL.push(mat);
+              paramMaterialDto: e.idDto,
+              cantidadDto: e.quantityDto
+            }
+            matL.push(mat);
+
+          });
 
         });
       }
@@ -522,8 +526,6 @@ export class ManageWorkOrderPage implements OnInit, OnDestroy {
     // You can access the original file using image.path, which can be
     // passed to the Filesystem API to read the raw data of the image,
     // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-    //console.log(image.base64String);
-    //console.log(image);
     //var imageUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`data:image/${image.format};base64, ${image.base64String}`);
     var imageUrl = `data:image/${image.format};base64, ${image.base64String}`;
 

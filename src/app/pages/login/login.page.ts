@@ -88,8 +88,8 @@ export class LoginPage implements OnInit {
     }
   }
 
-  showLoading() {
-    this.comService.showLoading();
+  async showLoading() {
+    await this.comService.showLoading();
   }
 
   dismissLoading() {
@@ -97,7 +97,7 @@ export class LoginPage implements OnInit {
   }
 
   async setSession(session: Session) {
-    await this.storageService.loadSession({ token: session.token, userID: session.userID })
+    await this.storageService.loadSession({ token: session.token, userID: session.userID, nameUser: session.nameUser, chargeUser: session.chargeUser })
   }
 
 

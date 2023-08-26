@@ -38,6 +38,8 @@ export interface SaveLocationUser {
 export interface Session {
   token: string;
   userID: string;
+  nameUser: string;
+  chargeUser: string;
 }
 
 export interface Master {
