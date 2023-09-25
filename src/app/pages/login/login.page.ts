@@ -58,7 +58,7 @@ export class LoginPage implements OnInit {
     });
   }
 
-  onSubmit() {
+  async onSubmit() {
 
     let ev: any = undefined;
 
@@ -66,7 +66,7 @@ export class LoginPage implements OnInit {
 
     if (this.loginForm.valid) {
 
-      this.showLoading();
+      await this.showLoading();
       this.login = {
         user: this.loginForm.get('user')?.value,
         password: this.loginForm.get('password')?.value,
@@ -80,6 +80,10 @@ export class LoginPage implements OnInit {
             this.dismissLoading();
             this.globalService.sendLocation();
             this.router.navigate(['/home']);
+          } if (!resp.isSuccessful && resp.result != undefined) {
+            this.setSession(resp.result);
+            this.dismissLoading();
+            this.router.navigate(['/change-password']);
           } else {
             this.dismissLoading();
             this.invalidLogin = true;

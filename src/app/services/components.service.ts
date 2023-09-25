@@ -21,7 +21,6 @@ export class ComponentsService {
   }
 
   dismissLoading(){
-    console.log(this.loading);
     this.loading?.dismiss();
   }
 }

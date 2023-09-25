@@ -72,8 +72,8 @@ export class HomePage implements OnInit {
     this.getSession();
   }
 
-  getWorkOrders(userID: string) {
-    this.showLoading()
+  async getWorkOrders(userID: string) {
+    await this.showLoading()
     this.homeService.GetWorkOrderByUser(userID).subscribe(resp => {
       this.workOrders = resp.result;
       if ((this.workOrders || []).length <= 0) {
@@ -149,8 +149,8 @@ export class HomePage implements OnInit {
     event.target.complete();
   };
 
-  showLoading() {
-    this.comService.showLoading();
+  async showLoading() {
+    await this.comService.showLoading();
   }
 
   dismissLoading() {

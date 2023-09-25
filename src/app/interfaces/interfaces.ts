@@ -29,6 +29,11 @@ export interface Login {
   longitude:number;
 }
 
+export interface ChangePassword {
+  user?: string;
+  password: string;
+}
+
 export interface SaveLocationUser {
   idUser: string;
   latitude: number;

@@ -45,7 +45,7 @@ export class WorkOrderPage implements OnInit {
     private workOrderService: WorkOrderService, private alertCtrl: AlertController,
     private route: ActivatedRoute,
     private modalCtrl: ModalController,
-    //private nativeGeocoder: NativeGeocoder
+    private nativeGeocoder: NativeGeocoder
   ) {
 
     this.getLocation();
@@ -99,15 +99,15 @@ export class WorkOrderPage implements OnInit {
 
     this.addressArray = [];
 
-    // this.nativeGeocoder.reverseGeocode(this.coordinates.coords.latitude, this.coordinates.coords.longitude, options)
-    //   .then((result: NativeGeocoderResult[]) => {
+    this.nativeGeocoder.reverseGeocode(this.coordinates.coords.latitude, this.coordinates.coords.longitude, options)
+      .then((result: NativeGeocoderResult[]) => {
 
-    //     let resultGeo = result;
-    //     resultGeo.forEach((e: any) => {
-    //       this.addressArray.push(e.addressLines[0].split(",")[0])
-    //     });
-    //   })
-    //   .catch((error: any) => console.log(error));
+        let resultGeo = result;
+        resultGeo.forEach((e: any) => {
+          this.addressArray.push(e.addressLines[0].split(",")[0])
+        });
+      })
+      .catch((error: any) => console.log(error));
 
     this.mostrarModal();
   }
@@ -184,14 +184,14 @@ export class WorkOrderPage implements OnInit {
     });
   }
 
-  onSubmit() {
+  async onSubmit() {
 
     let ev: any = undefined;
 
     this.workOrderFormRef.onSubmit(ev);
 
     if (this.workOrderForm.valid) {
-      this.showLoading();
+      await this.showLoading();
       this.saveOrderWorkIN = {
         numeroOrdenDto: this.workOrderForm.get('workOrder')?.value,
         usuarioRegistraDto: this.session.userID,
@@ -279,8 +279,8 @@ export class WorkOrderPage implements OnInit {
   }
 
 
-  showLoading() {
-    this.comService.showLoading();
+  async showLoading() {
+    await this.comService.showLoading();
   }
 
   dismissLoading() {
